@@ -1,14 +1,16 @@
-import os
 from typing import List
+import os
 
 from sentence_transformers import SentenceTransformer
 from nltk.tokenize import sent_tokenize
 from pypdf import PdfReader
-from torch import Tensor
+import chromadb
 
 from utils.constants import PathSettings, ConstantSettings
 
-model = SentenceTransformer(ConstantSettings.EMBEDDING_MODEL_NAME)
+client = chromadb.PersistentClient(path=PathSettings.CHROMA_DB_PATH)
+collection = client.create_collection(name="pdf_embeddings1")
+model = SentenceTransformer(ConstantSettings.EMBEDDING_MODEL_NAME,)
 
 
 def text_extractor(pdf_name: str) -> str:
@@ -73,7 +75,7 @@ def split_text_to_chunks(input_list: list,
     return [input_list[i:i + slice_size] for i in range(0, len(input_list), slice_size)]
 
 
-def embed_chunks(chunked_text: List[List[str]]) -> list[Tensor]:
+def embed_chunks(chunked_text: List[List[str]]) -> list[List[float]]:
     """
     Embeds each chunk of text using a pre-trained sentence transformer model
     Args:
@@ -85,9 +87,41 @@ def embed_chunks(chunked_text: List[List[str]]) -> list[Tensor]:
     embeddings = []
     for chunk in chunked_text:
         combined_text = ' '.join(chunk)
+        # Sentence-Transformers returns NumPy arrays by default
         chunk_embeddings = model.encode(combined_text)
-        embeddings.append(chunk_embeddings)
+        # Convert the NumPy array to a list
+        embeddings.append(chunk_embeddings.tolist())
     return embeddings
+
+
+def store_embeddings_on_chroma(pdf_name: str, chunked_text: list[list[str]]):
+    """
+    Store embeddings of PDF chunks into Chroma vector database.
+    Args:
+        pdf_name: name of the pdf
+        chunked_text: list of text chunks
+    """
+    success = True
+    try:
+        embeddings = embed_chunks(chunked_text)
+
+        for i, embedding in enumerate(embeddings):
+            chunk_id = f"{pdf_name}_chunk_{i}"
+            combined_text = ' '.join(chunked_text[i])
+            meta_data = {
+                "pdf_name": pdf_name,
+                "chunk_text": combined_text
+            }
+            collection.add(
+                ids=[chunk_id],
+                embeddings=[embedding],
+                metadatas=[meta_data]
+            )
+        return success
+    except Exception as e:
+        print("Exception occurred: ", str(e))
+        success = False
+        return success
 
 
 if __name__ == '__main__':
@@ -95,5 +129,4 @@ if __name__ == '__main__':
     clean_text = text_cleaner(texts)
     sentences = sentence_tokenizer(clean_text)
     split_sentences = split_text_to_chunks(sentences)
-    embed = embed_chunks(split_sentences)
-    print(embed)
+    store_embeddings_on_chroma(pdf_name="monopoly.pdf", chunked_text=split_sentences)

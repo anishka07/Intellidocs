@@ -3,3 +3,4 @@ pdfs
 .DS_Store
 __pycache__
 .idea
+db
