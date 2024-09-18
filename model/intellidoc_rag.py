@@ -1,16 +1,19 @@
-from typing import List
 import os
+import shutil
+from typing import List
 
-from sentence_transformers import SentenceTransformer
+from langchain_community.vectorstores import Chroma
 from nltk.tokenize import sent_tokenize
+from pymupdf import Document
 from pypdf import PdfReader
-import chromadb
+from sentence_transformers import SentenceTransformer
 
 from utils.constants import PathSettings, ConstantSettings
 
-client = chromadb.PersistentClient(path=PathSettings.CHROMA_DB_PATH)
-collection = client.create_collection(name="pdf_embeddings1")
-model = SentenceTransformer(ConstantSettings.EMBEDDING_MODEL_NAME,)
+# client = chromadb.PersistentClient(path=PathSettings.CHROMA_DB_PATH)
+# collection = client.create_collection(name="pdf_embeddings1")
+model = SentenceTransformer(ConstantSettings.EMBEDDING_MODEL_NAME)
+CHROMA_PATH = "chroma"
 
 
 def text_extractor(pdf_name: str) -> str:
@@ -94,39 +97,33 @@ def embed_chunks(chunked_text: List[List[str]]) -> list[List[float]]:
     return embeddings
 
 
-def store_embeddings_on_chroma(pdf_name: str, chunked_text: list[list[str]]):
+def save_to_chroma(chunks: list[list[str]]):
     """
-    Store embeddings of PDF chunks into Chroma vector database.
-    Args:
-        pdf_name: name of the pdf
-        chunked_text: list of text chunks
-    """
-    success = True
-    try:
-        embeddings = embed_chunks(chunked_text)
+  Save the given list of Document objects to a Chroma database.
+  Args:
+  chunks (list[Document]): List of Document objects representing text chunks to save.
+  Returns:
+  None
+  """
 
-        for i, embedding in enumerate(embeddings):
-            chunk_id = f"{pdf_name}_chunk_{i}"
-            combined_text = ' '.join(chunked_text[i])
-            meta_data = {
-                "pdf_name": pdf_name,
-                "chunk_text": combined_text
-            }
-            collection.add(
-                ids=[chunk_id],
-                embeddings=[embedding],
-                metadatas=[meta_data]
-            )
-        return success
-    except Exception as e:
-        print("Exception occurred: ", str(e))
-        success = False
-        return success
+    # Clear out the existing database directory if it exists
+    if os.path.exists(CHROMA_PATH):
+        shutil.rmtree(CHROMA_PATH)
+
+    # Create a new Chroma database from the documents using OpenAI embeddings
+    db = Chroma.from_documents(
+        chunks,
+        SentenceTransformer(ConstantSettings.EMBEDDING_MODEL_NAME),
+        persist_directory=CHROMA_PATH
+    )
+
+    # Persist the database to disk
+    db.persist()
+    print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
 
 
 if __name__ == '__main__':
     texts = text_extractor("monopoly.pdf")
     clean_text = text_cleaner(texts)
     sentences = sentence_tokenizer(clean_text)
-    split_sentences = split_text_to_chunks(sentences)
-    store_embeddings_on_chroma(pdf_name="monopoly.pdf", chunked_text=split_sentences)
+    save_to_chroma(sentences)
