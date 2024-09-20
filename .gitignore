@@ -4,3 +4,5 @@ pdfs
 __pycache__
 .idea
 db
+LaMini-T5-738M
+.env
