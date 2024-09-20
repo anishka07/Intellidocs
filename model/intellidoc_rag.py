@@ -4,14 +4,11 @@ from typing import List
 
 from langchain_community.vectorstores import Chroma
 from nltk.tokenize import sent_tokenize
-from pymupdf import Document
 from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 
 from utils.constants import PathSettings, ConstantSettings
 
-# client = chromadb.PersistentClient(path=PathSettings.CHROMA_DB_PATH)
-# collection = client.create_collection(name="pdf_embeddings1")
 model = SentenceTransformer(ConstantSettings.EMBEDDING_MODEL_NAME)
 CHROMA_PATH = "chroma"
 
