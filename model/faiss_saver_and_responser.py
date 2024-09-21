@@ -90,7 +90,7 @@ class VectorStore:
         prompt = f"Based on the following information, please answer the query: '{query_text}'\n\nContext: {concatenated_chunks}"
         response = self.gemini_model.generate_content(prompt)
 
-        return concatenated_chunks
+        return response.text
 
 
 if __name__ == '__main__':
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     extracted_text = pdf_processor.extract_text()
     cleaned_text = pdf_processor.clean_text()
 
-    text_processor = TextProcessor(cleaned_text, 10)
+    text_processor = TextProcessor(cleaned_text, 100)
     tokenized_sentences = text_processor.sentence_tokenizer()
     chunks = text_processor.split_text_to_chunks()
 
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     vector_store.add_embeddings_to_index(embeddings)
 
     # Query the index (example)
-    query_text = "collecting labelled data"
+    query_text = "what does this book say about Data collection and labeling?"
     gemini_response = vector_store.search(query_text, top_k=5)
 
     print('Gemini response:', gemini_response)
