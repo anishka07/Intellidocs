@@ -1,19 +1,18 @@
 import os
 import re
 
+import faiss
 import google.generativeai as genai
 import streamlit as st
-import faiss
 from dotenv import load_dotenv
-from sentence_transformers import SentenceTransformer
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
 # from langchain.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from pypdf import PdfReader
+from sentence_transformers import SentenceTransformer
 
-from utils.constants import PathSettings, ConstantSettings
+from utils.constants import ConstantSettings
 
 load_dotenv()
 GA_API_KEY = os.getenv("GOOGLE_GEMINI_API_TOKEN")
