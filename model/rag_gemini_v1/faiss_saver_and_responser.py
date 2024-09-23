@@ -7,8 +7,8 @@ import numpy as np
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 
-from model.document_processor import PDFProcessor
-from model.text_processor import TextProcessor
+from model.rag_gemini_v1.document_processor import PDFProcessor
+from model.rag_gemini_v1.text_processor import TextProcessor
 from utils.constants import PathSettings, ConstantSettings
 
 load_dotenv()
@@ -94,7 +94,7 @@ class VectorStore:
 
 
 if __name__ == '__main__':
-    pdf_processor = PDFProcessor("nlp.pdf", PathSettings.PDF_FILE_PATH)
+    pdf_processor = PDFProcessor("nlp.pdf", PathSettings.PDF_DIR_PATH)
     extracted_text = pdf_processor.extract_text()
     cleaned_text = pdf_processor.clean_text()
 

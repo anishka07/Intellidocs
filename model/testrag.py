@@ -12,7 +12,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 
-from utils.constants import ConstantSettings
+from utils.constants import ConstantSettings, PathSettings
 
 load_dotenv()
 GA_API_KEY = os.getenv("GOOGLE_GEMINI_API_TOKEN")
@@ -160,4 +160,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    print(PathSettings.PDF_DIR_PATH)

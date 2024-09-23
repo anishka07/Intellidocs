@@ -3,10 +3,12 @@ import os
 import pickle
 import re
 
+import fitz
 import numpy as np
 from pypdf import PdfReader
 from sklearn.metrics.pairwise import cosine_similarity
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+from tqdm.auto import tqdm
 
 from utils.constants import PathSettings
 
@@ -20,15 +22,19 @@ class PdfTextLoader:
         if not os.path.exists(self.complete_pdf_path):
             print("This file does not exists: ", self.complete_pdf_path)
         self.pdf_reader = PdfReader(self.complete_pdf_path)
+        self.doc = fitz.open(self.pdf_path)
 
     def pdf_text_extractor(self) -> str:
-        texts = ""
-        for pages in self.pdf_reader.pages:
-            page_info = pages.extract_text()
-            if page_info:
-                texts += page_info
-        texts = texts.replace("\n", "").replace("\t", "")
-        return texts
+        all_text = ""
+        for page_number, page in tqdm(enumerate(doc), total=len(doc), desc="Extracting PDF"):
+            text = page.get_text("text")
+            all_text += text
+
+        doc.close()
+
+        all_text = all_text.replace("\n", " ").replace("\t", " ")
+
+        return all_text
 
     def chunk_text(self, chunk_size: int = 1000, chunk_overlap: int = 20) -> list[str]:
         """
@@ -175,19 +181,19 @@ def find_most_similar_chunk(query_text, doc2vec_model, text_embeddings, text_chu
 
 
 if __name__ == '__main__':
-    pdf_text_loader = PdfTextLoader(pdf_name='nlp.pdf', pdf_path=PathSettings.PDF_DIR_PATH)
+    pdf_text_loader = PdfTextLoader(pdf_name='health.pdf', pdf_path=PathSettings.PDF_DIR_PATH)
     chunks = pdf_text_loader.chunk_text(chunk_size=1000, chunk_overlap=20)
 
     text_embedder = TextEmbedding(vector_size=100, min_count=2, epochs=100)
-    text_embedder.train_doc2vec(text_chunks=chunks, save_model=False, model_name='embeddings_v3')
+    text_embedder.train_doc2vec(text_chunks=chunks, save_model=False, model_name='embeddings_v4')
     embeddings = text_embedder.embed_text(text_chunks=chunks)
 
-    save_embeddings_to_csv(text_chunks=chunks, text_embeddings=embeddings, csv_file_name='chunks_and_embeddings_v2')
+    save_embeddings_to_csv(text_chunks=chunks, text_embeddings=embeddings, csv_file_name='chunks_and_embeddings_v4')
 
-    chunks, embeddings = load_embeddings_from_csv('chunks_and_embeddings_v2')
+    chunks, embeddings = load_embeddings_from_csv('chunks_and_embeddings_v4')
 
     # Simulate a user query
-    query = "tranformers in natural language processing"
+    query = "symptoms of pellagra"
     similar_chunks = find_most_similar_chunk(query, text_embedder.model, embeddings, chunks, top_n=3)
 
     for chunk, similarity in similar_chunks:
