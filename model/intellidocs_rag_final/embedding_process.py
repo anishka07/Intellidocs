@@ -4,9 +4,9 @@ import pandas as pd
 from sentence_transformers import SentenceTransformer
 from tqdm.auto import tqdm
 
-from model.intellidocs_rag.intellidocs_rag_constants import id_rag_pdf_path, id_pdf_name, sent_tokenizer_model_name
-from model.intellidocs_rag.pdf_loader import pdf_loader_main
-from model.intellidocs_rag.chunk_processor import tp_main
+from model.intellidocs_rag_final.intellidocs_rag_constants import id_rag_pdf_path, id_pdf_name, sent_tokenizer_model_name
+from model.intellidocs_rag_final.pdf_loader import pdf_loader_main
+from model.intellidocs_rag_final.chunk_processor import tp_main
 from utils.constants import PathSettings
 
 

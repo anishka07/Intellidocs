@@ -7,7 +7,7 @@ from pypdf import PdfReader
 from spacy.lang.en import English
 from tqdm.auto import tqdm
 
-from model.intellidocs_rag.intellidocs_rag_constants import id_rag_pdf_path, id_pdf_name
+from model.intellidocs_rag_final.intellidocs_rag_constants import id_rag_pdf_path, id_pdf_name
 from utils.constants import PathSettings
 
 

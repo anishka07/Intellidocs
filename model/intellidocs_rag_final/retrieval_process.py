@@ -6,7 +6,7 @@ import pandas as pd
 import torch
 from sentence_transformers import util, SentenceTransformer
 
-from model.intellidocs_rag.intellidocs_rag_constants import sent_tokenizer_model_name
+from model.intellidocs_rag_final.intellidocs_rag_constants import sent_tokenizer_model_name
 from utils.constants import PathSettings
 
 
