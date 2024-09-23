@@ -1,5 +1,4 @@
 import os
-from time import perf_counter as timer
 from typing import Tuple
 
 import numpy as np
@@ -35,15 +34,7 @@ class Retriever:
         Embeds a query with model and returns top k scores and indices from embeddings.
         """
         query_embedding = self.embedding_model.encode(query, convert_to_tensor=True)
-
-        start_time = timer()
         dot_scores = util.dot_score(query_embedding, self.embeddings)[0]
-        end_time = timer()
-
-        if print_time:
-            print(
-                f"[INFO] Time taken to get scores on {len(self.embeddings)} embeddings: {end_time - start_time:.5f} seconds.")
-
         scores, indices = torch.topk(input=dot_scores, k=n_resources_to_return)
 
         return scores, indices
@@ -71,8 +62,7 @@ class Retriever:
         print(textwrap.fill(text, width=width))
 
 
-# Usage example:
 if __name__ == "__main__":
     retriever = Retriever(os.path.join(PathSettings.CSV_DB_DIR_PATH, "test1.csv"))
-    query = "carbohydrates"
+    query = "macronutrients"
     retriever.print_top_results_and_scores(query)
