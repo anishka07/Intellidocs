@@ -110,6 +110,9 @@ To run IntelliDocs from it's streamlit UI:
 streamlit run ui.py
 ```
 
+## Streamlit Interface
+
+![Alt Text](images/ui.png)
 
 ## Usage
 
