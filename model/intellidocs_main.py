@@ -23,16 +23,18 @@ def intelli_docs_main(query: str, save_csv_name: str, save_csv_dir: str, rag_dev
         dev=rag_device
     ):
         print("Embeddings created successfully.")
-    retriever_main(
+    results = retriever_main(
         embeddings_df_path=os.path.join(PathSettings.CSV_DB_DIR_PATH, save_csv_name),
         user_query=query
     )
+    return results
 
 
 if __name__ == '__main__':
-    intelli_docs_main(
-        query="monopoly",
-        save_csv_name="test3.csv",
+    result = intelli_docs_main(
+        query="tadpoles",
+        save_csv_name="frog.csv",
         save_csv_dir="CSV_db",
         rag_device="cpu"
     )
+    print(result)

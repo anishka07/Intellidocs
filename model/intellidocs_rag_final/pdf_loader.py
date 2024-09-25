@@ -44,7 +44,7 @@ class PdfLoader:
         for page_number, page in tqdm(enumerate(docs)):
             text = page.get_text()
             text = text.replace("\n", "").strip()
-            page_and_text.append({"page_number": page_number - 41,  # only for the pdf we're using
+            page_and_text.append({"page_number": page_number,  # - 41 for the health pdf
                                   "page_char_count": len(text),
                                   "page_word_count": len(text.split(" ")),
                                   "page_sentence_count_raw": len(text.split(". ")),
@@ -77,5 +77,5 @@ def pdf_loader_main(path: str, pdf_name: str):
 
 
 if __name__ == '__main__':
-    pages_and_texts = pdf_loader_main(path=id_rag_pdf_path, pdf_name=id_pdf_name)
-    print(pages_and_texts[0])
+    pages_and_texts = pdf_loader_main(path=id_rag_pdf_path, pdf_name='frog.pdf')
+    print(pages_and_texts[0:5])

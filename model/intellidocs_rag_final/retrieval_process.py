@@ -18,9 +18,15 @@ class Retriever:
         self.pages_and_chunks = self.embeddings_df.to_dict(orient="records")
         self.embeddings = self._prepare_embeddings()
 
+    # def _load_embeddings(self, embeddings_df_path: str) -> pd.DataFrame:
+    #     df = pd.read_csv(embeddings_df_path)
+    #     df["embeddings"] = df["embeddings"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
+    #     return df
+
     def _load_embeddings(self, embeddings_df_path: str) -> pd.DataFrame:
         df = pd.read_csv(embeddings_df_path)
         df["embeddings"] = df["embeddings"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
+        self.embedding_model_name = df['model_name'].iloc[0]
         return df
 
     def _prepare_embeddings(self) -> torch.Tensor:
@@ -62,9 +68,20 @@ class Retriever:
         print(textwrap.fill(text, width=width))
 
 
-def retriever_main(user_query: str, embeddings_df_path: str):
-    rag_retriever = Retriever(embeddings_df_path, sent_tokenizer_model_name)
-    rag_retriever.print_top_results_and_scores(user_query)
+def retriever_main(embeddings_df_path: str, user_query: str):
+    retriever = Retriever(embeddings_df_path)
+    scores, indices = retriever.retrieve_relevant_resources(user_query)
+
+    results = []
+    for score, index in zip(scores, indices):
+        result = {
+            "score": score.item(),
+            "text": retriever.pages_and_chunks[index]["sentence_chunk"],
+            "page_number": retriever.pages_and_chunks[index]["page_number"]
+        }
+        results.append(result)
+
+    return results
 
 
 if __name__ == "__main__":
