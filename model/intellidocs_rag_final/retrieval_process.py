@@ -62,6 +62,11 @@ class Retriever:
         print(textwrap.fill(text, width=width))
 
 
+def retriever_main(user_query: str, embeddings_df_path: str):
+    rag_retriever = Retriever(embeddings_df_path, sent_tokenizer_model_name)
+    rag_retriever.print_top_results_and_scores(user_query)
+
+
 if __name__ == "__main__":
     retriever = Retriever(os.path.join(PathSettings.CSV_DB_DIR_PATH, "test1.csv"))
     query = "macronutrients"

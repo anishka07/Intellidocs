@@ -12,10 +12,12 @@ from utils.constants import PathSettings
 
 class EmbeddingProcessor:
 
-    def __init__(self, embedding_model_name: str, pages_and_chunks: list[dict], project_dir: str):
+    def __init__(self, embedding_model_name: str, pages_and_chunks: list[dict], project_dir: str, csv_name: str, save_dir: str):
         self.embedding_model = SentenceTransformer(embedding_model_name)
         self.pages_and_chunks = pages_and_chunks
         self.project_dir = project_dir
+        self.csv_name = csv_name
+        self.save_dir = save_dir
 
     def move_model_to_device(self, device: str = "cpu"):
         """Moves the embedding model to the specified device (cpu or gpu)."""
@@ -42,13 +44,20 @@ class EmbeddingProcessor:
         )
         return text_chunk_embeddings
 
-    def save_embeddings_to_csv(self, save_dir: str = "CSV_db", csv_name: str = "test1.csv"):
+    def save_embeddings_to_csv(self):
         """Saves the processed chunks with embeddings into a CSV file."""
         text_chunks_and_embeddings_df = pd.DataFrame(self.pages_and_chunks)
-        embeddings_df_save_path = os.path.join(self.project_dir, save_dir, csv_name)
+        embeddings_df_save_path = os.path.join(self.project_dir, self.save_dir, self.csv_name)
         os.makedirs(os.path.dirname(embeddings_df_save_path), exist_ok=True)  # Ensure directory exists
         text_chunks_and_embeddings_df.to_csv(embeddings_df_save_path, index=False)
         print(f"Embeddings saved to {embeddings_df_save_path}")
+
+
+def embedding_process_main(embedding_model_name: str, pages_and_chunks: list[dict], project_dir: str, csv_name: str, save_dir: str, dev: str):
+    ep = EmbeddingProcessor(embedding_model_name, pages_and_chunks, project_dir, csv_name, save_dir)
+    ep.move_model_to_device(device=dev)
+    ep.add_embeddings_to_chunks()
+    ep.save_embeddings_to_csv()
 
 
 if __name__ == '__main__':
