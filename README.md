@@ -14,13 +14,13 @@
 
 ## Technologies Used
 
-- **Programming Language**: Python
+- **Programming Language**: `Python`
 - **Libraries**:
   - `pandas`: For data manipulation and embedding storage in csv format (no vector database used).
   - `sentence-transformers`: For embedding text chunks.
   - `fitz`: For PDF text extraction.
   - `Streamlit`: For creating user interface (temporary).
-- **Machine Learning**: Utilizes pre-trained embedding model for vector embeddings but does not use vector database for storage.
+- **Machine Learning**: Utilizes `pre-trained` embedding model for vector embeddings but does not use vector database for storage.
 
 ## Project Structure
 
