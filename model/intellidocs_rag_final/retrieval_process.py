@@ -18,11 +18,6 @@ class Retriever:
         self.pages_and_chunks = self.embeddings_df.to_dict(orient="records")
         self.embeddings = self._prepare_embeddings()
 
-    # def _load_embeddings(self, embeddings_df_path: str) -> pd.DataFrame:
-    #     df = pd.read_csv(embeddings_df_path)
-    #     df["embeddings"] = df["embeddings"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
-    #     return df
-
     def _load_embeddings(self, embeddings_df_path: str) -> pd.DataFrame:
         df = pd.read_csv(embeddings_df_path)
         df["embeddings"] = df["embeddings"].apply(lambda x: np.fromstring(x.strip("[]"), sep=" "))
