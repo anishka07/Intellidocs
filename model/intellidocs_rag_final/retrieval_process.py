@@ -11,6 +11,7 @@ from utils.constants import PathSettings
 
 
 class Retriever:
+
     def __init__(self, embeddings_df_path: str, model_name: str = sent_tokenizer_model_name):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.embedding_model = SentenceTransformer(model_name_or_path=model_name, device=self.device)
@@ -29,8 +30,7 @@ class Retriever:
 
     def retrieve_relevant_resources(self,
                                     query: str,
-                                    n_resources_to_return: int = 5,
-                                    print_time: bool = True) -> Tuple[torch.Tensor, torch.Tensor]:
+                                    n_resources_to_return: int = 5) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Embeds a query with model and returns top k scores and indices from embeddings.
         """

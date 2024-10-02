@@ -32,8 +32,8 @@ def intelli_docs_main(query: str, save_csv_name: str, save_csv_dir: str, rag_dev
 
 if __name__ == '__main__':
     result = intelli_docs_main(
-        query="tadpoles",
-        save_csv_name="frog.csv",
+        query="macro nutrients",
+        save_csv_name="mn.csv",
         save_csv_dir="CSV_db",
         rag_device="cpu"
     )

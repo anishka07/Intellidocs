@@ -8,6 +8,7 @@ from model.intellidocs_rag_final.pdf_loader import pdf_loader_main
 
 
 class ChunkProcessor:
+
     def __init__(self, pages_and_texts: list[dict], min_token_length: int):
         self.pages_and_texts = pages_and_texts
         self.min_token_length = min_token_length
