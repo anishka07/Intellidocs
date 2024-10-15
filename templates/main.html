@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page - IntelliDocs</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1 class="logo">IntelliDocs</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('main_page') }}">Main Page</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Welcome, {{ session['username'] }}!</h2>
+        <p>You are now logged in.</p>
+        <!-- Add more content as needed -->
+    </main>
+</body>
+</html>
