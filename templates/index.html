@@ -28,7 +28,7 @@
         {% if 'username' in session %}
             <p class="welcome-message">Welcome, {{ session['username'] }}!</p>
         {% endif %}
-        <button class="get-started-btn">Get Started</button>
+        <a href="{{ url_for('chat') }}"><button class="get-started-btn">Get Started</button></a>
     </div>
 
     <!-- Footer -->
