@@ -1,0 +1,136 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #1b1b1b;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #1b1b1b;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+nav ul {
+    list-style-type: none;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: #f39c12;
+}
+
+/* Chat container */
+.chat-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.chat-box {
+    width: 100%;
+    max-width: 700px;
+    height: 400px;
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.chat-form {
+    display: flex;
+    width: 100%;
+    max-width: 700px;
+}
+
+.upload-input {
+    margin-right: 10px;
+}
+
+.chat-input {
+    flex-grow: 1;
+    padding: 10px;
+    background-color: #444;
+    border: none;
+    border-radius: 25px;
+    color: #fff;
+}
+
+.send-btn {
+    padding: 10px 20px;
+    background-color: #f39c12;
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.send-btn:hover {
+    background-color: #d87b08;
+}
+
+/* Footer */
+footer {
+    padding: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .logo {
+        font-size: 1.2rem;
+    }
+
+    nav ul li {
+        margin-left: 10px;
+    }
+
+    .chat-box {
+        height: 300px;
+    }
+
+    .chat-input {
+        font-size: 0.9rem;
+    }
+
+    .send-btn {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+}
