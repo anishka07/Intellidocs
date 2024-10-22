@@ -1,6 +1,8 @@
 import os
 from functools import wraps
+
 from flask import Flask, render_template, request, session, flash, redirect, url_for
+from flask_socketio import SocketIO, emit
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import bcrypt
@@ -12,11 +14,12 @@ app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
 
 app.config['MYSQL_HOST'] = os.getenv('DB_HOST', 'localhost')
-app.config['MYSQL_USER'] = os.getenv('DB_USER', 'root')
-app.config['MYSQL_PASSWORD'] = os.getenv('DB_PW', 'anishka123')
+app.config['MYSQL_USER'] = os.getenv('DB_USER', 'intellidocs')
+app.config['MYSQL_PASSWORD'] = os.getenv('DB_PW', '12345')
 app.config['MYSQL_DB'] = os.getenv('DB_NAME', 'intellidocs_login')
 
 mysql = MySQL(app)
+socket_message = SocketIO(app)
 
 
 def login_required(f):
@@ -28,6 +31,13 @@ def login_required(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+@socket_message.on('send_message')
+def handle_send_message_event(data):
+    message = data['message']
+    username = session['username'] if 'username' in session else 'Guest'
+    emit('receive_message', {'message': message, 'username': username}, broadcast=True)
 
 
 @app.route('/')
@@ -80,6 +90,12 @@ def signup():
                 return redirect(url_for('login'))
 
     return render_template('auth/signup.html')
+
+
+@app.route('/chat')
+@login_required
+def chat():
+    return render_template('intellidocschat.html')
 
 
 @app.route('/logout')
