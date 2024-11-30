@@ -1,5 +1,4 @@
 torch~=2.4.0
-transformers~=4.44.2
 streamlit~=1.37.1
 numpy~=1.26.4
 python-dotenv~=1.0.1
@@ -19,3 +18,4 @@ pymilvus~=2.4.7
 mysqlclient~=2.2.4
 bcrypt~=4.2.0
 flask-socketio~=5.4.1
+ollama~=0.4.2
