@@ -1,5 +1,7 @@
 import streamlit as st
 import os
+
+from model.intellidocs_main import llm_response
 from model.intellidocs_rag_final.chunk_processor import tp_main
 from model.intellidocs_rag_final.embedding_process import embedding_process_main
 from model.intellidocs_rag_final.intellidocs_rag_constants import sent_tokenizer_model_name
@@ -10,6 +12,17 @@ from utils.constants import PathSettings
 st.title("IntelliDocs: PDF Query System")
 
 uploaded_file = st.file_uploader("Upload a PDF", type=["pdf"])
+
+
+def main(embeddings_df_path: str, query: str):
+    pdf_results = retriever_main(embeddings_df_path, query)
+    formatted_results = "\n".join([
+        f"Score: {r['score']}, Page: {r['page_number']}, Text: {r['text']}"
+        for r in pdf_results
+    ])
+    llm_generated_response = llm_response(formatted_results)
+    return llm_generated_response
+
 
 if uploaded_file is not None:
     pdf_path = os.path.join(PathSettings.PDF_DIR_PATH, uploaded_file.name)
@@ -41,10 +54,9 @@ if uploaded_file is not None:
     user_query = st.text_input("Enter your query:")
 
     if user_query:
-        results = retriever_main(
-            embeddings_df_path=os.path.join(PathSettings.CSV_DB_DIR_PATH, csv_name),
-            user_query=user_query
-        )
+        embedding_df_path = os.path.join(PathSettings.CSV_DB_DIR_PATH, csv_name)
+        with st.spinner("Processing your query and generating response..."):
+            response, results = main(embedding_df_path, user_query)
 
         if results:
             st.write("Top results:")
@@ -53,6 +65,9 @@ if uploaded_file is not None:
                 st.write(f"**Page Number:** {result['page_number']}")
                 st.write(f"**Text Chunk:** {result['text']}")
                 st.write("\n---\n")
+
+            st.write("### LLM Generated Response")
+            st.write(response)
         else:
             st.write("No results found.")
 

@@ -75,7 +75,6 @@ def retriever_main(embeddings_df_path: str, user_query: str):
             "page_number": retriever.pages_and_chunks[index]["page_number"]
         }
         results.append(result)
-
     return results
 
 
