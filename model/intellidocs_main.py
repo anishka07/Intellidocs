@@ -17,7 +17,7 @@ genai.configure(api_key=os.environ["GOOGLE_GEMINI_API_TOKEN"])
 query = "what are macro nutrients?"
 
 
-def intelli_docs_main(query: str, save_csv_name: str, save_csv_dir: str, rag_device: str):
+def intelli_docs_main(user_query: str, save_csv_name: str, save_csv_dir: str, rag_device: str) -> str:
     if not save_csv_name.endswith('.csv'):
         save_csv_name += '.csv'
     pdf_extracted_text = pdf_loader_main(path=id_rag_pdf_path, pdf_name=id_pdf_name)
@@ -33,10 +33,10 @@ def intelli_docs_main(query: str, save_csv_name: str, save_csv_dir: str, rag_dev
         print("Embeddings created successfully.")
     results = retriever_main(
         embeddings_df_path=os.path.join(PathSettings.CSV_DB_DIR_PATH, save_csv_name),
-        user_query=query
+        user_query=user_query
     )
-    generated_response = ollama_llm_response(results)
-    return generated_response
+    gemini_response = gemini_llm_response(results)
+    return gemini_response
 
 
 def ollama_llm_response(pdf_results: str):
@@ -53,14 +53,13 @@ def gemini_llm_response(query: str):
     model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content(
         f'You are a RAG and this is the query the user asked {query} and these are the top 5 responses. I want you to summarize this and give me a structured response: {query}')
-    print(response.text)
+    return response.text
 
 
 if __name__ == '__main__':
     result = intelli_docs_main(
-        query=query,
+        user_query=query,
         save_csv_name="mn.csv",
         save_csv_dir="CSV_db",
         rag_device="cpu"
     )
-    print(result)
