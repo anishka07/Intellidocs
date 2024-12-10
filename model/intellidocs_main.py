@@ -57,7 +57,7 @@ def gemini_llm_response(query: str):
 
 
 if __name__ == '__main__':
-    result = intelli_docs_main(
+    result = intelli_docs_main( 
         user_query=query,
         save_csv_name="mn.csv",
         save_csv_dir="CSV_db",
