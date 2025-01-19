@@ -13,10 +13,15 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
 
-app.config['MYSQL_HOST'] = os.getenv('DB_HOST', 'localhost')
-app.config['MYSQL_USER'] = os.getenv('DB_USER', 'intellidocs')
-app.config['MYSQL_PASSWORD'] = os.getenv('DB_PW', '12345')
-app.config['MYSQL_DB'] = os.getenv('DB_NAME', 'intellidocs_login')
+mysql_host = os.getenv('DB_HOST')
+mysql_user = os.getenv('DB_USER')
+mysql_password = os.getenv('DB_PW')
+mysql_db_name = os.getenv('DB_NAME')
+
+app.config['MYSQL_HOST'] = mysql_host
+app.config['MYSQL_USER'] = mysql_user
+app.config['MYSQL_PASSWORD'] = mysql_password
+app.config['MYSQL_DB'] = mysql_db_name
 
 mysql = MySQL(app)
 socket_message = SocketIO(app)

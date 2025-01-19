@@ -12,6 +12,12 @@ from utils.constants import PathSettings
 
 
 def download_and_save_pdf(pdf_url: str, saved_pdf_name: str):
+    """
+
+    :param pdf_url: url of the pdf you want to download
+    :param saved_pdf_name: name of the pdf you want to save
+    :return: saved or not, response
+    """
     save_pdf_path = os.path.join(PathSettings.PDF_DIR_PATH, saved_pdf_name)
     response = requests.get(pdf_url)
     if response.status_code == 200:

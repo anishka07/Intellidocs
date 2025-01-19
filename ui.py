@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 
-from model.intellidocs_main import llm_response
+from model.intellidocs_main import gemini_llm_response
 from model.intellidocs_rag_final.chunk_processor import tp_main
 from model.intellidocs_rag_final.embedding_process import embedding_process_main
 from model.intellidocs_rag_final.intellidocs_rag_constants import sent_tokenizer_model_name
@@ -20,7 +20,7 @@ def main(embeddings_df_path: str, query: str):
         f"Score: {r['score']}, Page: {r['page_number']}, Text: {r['text']}"
         for r in pdf_results
     ])
-    llm_generated_response = llm_response(formatted_results)
+    llm_generated_response = gemini_llm_response(formatted_results)
     return llm_generated_response
 
 
