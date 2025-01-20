@@ -12,7 +12,6 @@ from utils.constants import PathSettings
 
 class Retriever:
 
-
     def __init__(self, embeddings_df_path: str, model_name: str = sent_tokenizer_model_name):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.embedding_model = SentenceTransformer(model_name_or_path=model_name, device=self.device)
