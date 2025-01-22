@@ -4,13 +4,20 @@ from model.intellidocs_rag_final.chunk_processor import tp_main
 from model.intellidocs_rag_final.embedding_process import embedding_process_main
 from model.intellidocs_rag_final.intellidocs_rag_constants import id_rag_pdf_path, id_pdf_name, \
     sent_tokenizer_model_name
-from model.intellidocs_rag_final.llm_response import llama_response, pipe
 from model.intellidocs_rag_final.pdf_loader import pdf_loader_main
 from model.intellidocs_rag_final.retrieval_process import retriever_main
 from utils.constants import PathSettings
 
 
 def intelli_docs_main(user_query: str, save_csv_name: str, save_csv_dir: str, rag_device: str) -> str:
+    """
+
+    :param user_query: users query
+    :param save_csv_name: name of the csv file to be saved
+    :param save_csv_dir: directory to save the csv file
+    :param rag_device: rag device
+    :return:
+    """
     if not save_csv_name.endswith('.csv'):
         save_csv_name += '.csv'
 
@@ -46,14 +53,7 @@ def intelli_docs_main(user_query: str, save_csv_name: str, save_csv_dir: str, ra
     total_responses = ""
     for r in results:
         total_responses += r["text"]
-
-    llm_response = llama_response(
-        query=user_query,
-        context=total_responses,
-        p=pipe
-    )
-    return llm_response
-
+    return total_responses
 
 
 if __name__ == '__main__':
