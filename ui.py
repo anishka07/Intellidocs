@@ -1,8 +1,14 @@
-import streamlit as st
+import logging
 import os
 
+import streamlit as st
+
 from model.intellidocs_main import intelli_docs_main
+from model.llms.gemini_response import gemini_response
 from utils.constants import PathSettings
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 st.title("IntelliDocs: AI powered insights for your documents.")
 
@@ -29,18 +35,23 @@ if uploaded_file is not None:
             st.write("CSV file not found. Generating embeddings...")
 
         with st.spinner("Processing your query and generating response..."):
-            response = intelli_docs_main(
+            # Step 1: Generate RAG response
+            rag_response = intelli_docs_main(
                 user_query=user_query,
                 save_csv_name=save_csv_name,
                 save_csv_dir=PathSettings.CSV_DB_DIR_PATH,
                 rag_device="cpu"
             )
 
-        if response:
-            # Append the query and response to the chat log
-            st.session_state.chat_log.append({"query": user_query, "response": response})
-        else:
-            st.session_state.chat_log.append({"query": user_query, "response": "No results found."})
+            # Step 2: Generate Gemini response based on RAG response
+            if rag_response:
+                llm_response = gemini_response(user_query, context=rag_response)
+                response = f"{rag_response}\n\nGemini's insights:\n{llm_response}"
+            else:
+                response = "No results found. Please try a different query."
+
+        # Append the query and response to the chat log
+        st.session_state.chat_log.append({"query": user_query, "response": response})
 
 # Display chat log
 if st.session_state.chat_log:

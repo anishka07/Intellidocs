@@ -1,4 +1,4 @@
-torch~=2.4.0
+torch~=2.5.0
 streamlit~=1.37.1
 numpy~=1.26.4
 python-dotenv~=1.0.1
