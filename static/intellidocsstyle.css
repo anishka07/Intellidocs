@@ -134,3 +134,17 @@ footer {
         padding: 8px 15px;
     }
 }
+.loading {
+    font-style: italic;
+    color: gray;
+    text-align: center;
+}
+
+.processing-status {
+    padding: 10px;
+    margin: 10px 0;
+    background: black;
+    border-radius: 5px;
+    text-align: center;
+    display: none;
+}
