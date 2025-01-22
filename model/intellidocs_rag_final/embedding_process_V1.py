@@ -5,15 +5,16 @@ from tqdm import tqdm
 
 class EmbeddingProcessorV1:
 
-    def __init__(self, embedding_model_name: str, pages_and_chunks: list[dict], project_dir: str, collection_name: str):
+    def __init__(self, embedding_model_name: str, pages_and_chunks: list[dict], project_dir: str, collection_name: str, connection_alias: str):
         self.embedding_model_name = embedding_model_name
         self.embedding_model = SentenceTransformer(self.embedding_model_name)
         self.embedding_model.tokenizer.clean_up_tokenization_spaces = True
         self.pages_and_chunks = pages_and_chunks
         self.project_dir = project_dir
         self.collection_name = collection_name
-        # Connect to milvus
-        connections.connect("default", host="localhost", port="19530")
+        self.connection_alias = connection_alias
+        # Connect to Milvus with the provided alias
+        connections.connect(self.connection_alias, host="localhost", port="19530")
 
     def move_model_to_device(self, device: str = "cpu"):
         self.embedding_model.to(device)
@@ -22,8 +23,8 @@ class EmbeddingProcessorV1:
         return self.embedding_model.encode(chunk)
 
     def create_collection(self):
-        if utility.has_collection(self.collection_name):
-            return Collection(self.collection_name)
+        if utility.has_collection(self.collection_name, using=self.connection_alias):
+            return Collection(self.collection_name, using=self.connection_alias)
 
         fields = [
             FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
@@ -32,7 +33,7 @@ class EmbeddingProcessorV1:
             FieldSchema(name="embeddings", dtype=DataType.FLOAT_VECTOR, dim=768)  # Adjust dimension as needed
         ]
         schema = CollectionSchema(fields, "PDF Chunks Collection")
-        collection = Collection(self.collection_name, schema)
+        collection = Collection(self.collection_name, schema, using=self.connection_alias)
 
         # Create an IVF_FLAT index for the embeddings field
         index_params = {
@@ -60,7 +61,7 @@ class EmbeddingProcessorV1:
 
 
 def embedding_process_main(embedding_model_name: str, pages_and_chunks: list[dict], project_dir: str,
-                           collection_name: str, dev: str):
-    ep = EmbeddingProcessorV1(embedding_model_name, pages_and_chunks, project_dir, collection_name)
+                           collection_name: str, dev: str, connection_alias: str):
+    ep = EmbeddingProcessorV1(embedding_model_name, pages_and_chunks, project_dir, collection_name, connection_alias)
     ep.move_model_to_device(device=dev)
     return ep.add_embeddings_to_chunks()
