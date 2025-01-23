@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <!-- Header with brand and nav links -->
     <header>
         <h1 class="logo">IntelliDocs</h1>
         <nav>
@@ -22,7 +21,6 @@
         </nav>
     </header>
 
-    <!-- Main section with quote, welcome message, and get started button -->
     <div class="content">
         <p class="quote">"AI powered insights for your documents."</p>
         {% if 'username' in session %}
@@ -31,7 +29,6 @@
         <a href="{{ url_for('chat') }}"><button class="get-started-btn">Get Started</button></a>
     </div>
 
-    <!-- Footer -->
     <footer>
         &copy; 2024 Intellidocs. All Rights Reserved.
     </footer>

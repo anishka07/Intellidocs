@@ -117,13 +117,11 @@
         <div class="form-box">
             <h2>Sign Up</h2>
 
-            <!-- Form submission to Flask signup route -->
             <form action="{{ url_for('signup') }}" method="POST">
                 <input type="text" name="username" id="new-username" placeholder="Username" required>
                 <input type="password" name="password" id="new-password" placeholder="Password" required>
                 <input type="password" name="confirm_password" id="confirm-password" placeholder="Confirm Password" required>
 
-                <!-- Server-side error message display -->
                 {% if msg %}
                     <p class="error-msg">{{ msg }}</p>
                 {% endif %}

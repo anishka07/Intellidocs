@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="/static/style.css">
     <title>Login - IntelliDocs</title>
     <style>
-        /* General Styles */
         body {
             font-family: Arial, sans-serif;
             background-color: #121212;
@@ -46,7 +45,6 @@
             text-decoration: underline;
         }
 
-        /* Authentication Section */
         .auth-section {
             display: flex;
             flex-direction: column;
@@ -124,13 +122,11 @@
         <section class="auth-section">
             <h2>Login</h2>
 
-            <!-- Form submission to Flask login route -->
             <form action="{{ url_for('login') }}" method="POST">
                 <input type="text" name="username" id="username" placeholder="Username" required>
                 <input type="password" name="password" id="password" placeholder="Password" required>
                 <button type="submit">Login</button>
 
-                <!-- Server-side error message display -->
                 {% if msg %}
                     <p class="error-msg">{{ msg }}</p>
                 {% endif %}
