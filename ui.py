@@ -1,71 +1,58 @@
-import logging
 import os
 
 import streamlit as st
 
-from model.intellidocs_main import intelli_docs_main
+from model.intellidocs_main import id_main
 from model.llms.gemini_response import gemini_response
 from utils.constants import PathSettings
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
-st.title("IntelliDocs: AI powered insights for your documents.")
+def main():
+    st.title("IntelliDocs RAG System")
+    st.write("Upload a PDF and query its content.")
 
-uploaded_file = st.file_uploader("Upload a PDF", type=["pdf"])
+    uploaded_pdf = st.file_uploader("Upload your PDF file", type=["pdf"])
+    user_query = st.text_input("Enter your query:")
+    submit_button = st.button("Submit Query")
 
-if "chat_log" not in st.session_state:
-    st.session_state.chat_log = []
+    if uploaded_pdf and user_query and submit_button:
+        save_pdf_path = os.path.join(PathSettings.PDF_DIR_PATH, uploaded_pdf.name)
+        save_csv_name = f"{os.path.splitext(uploaded_pdf.name)[0]}.csv"
 
-if uploaded_file is not None:
-    pdf_path = os.path.join(PathSettings.PDF_DIR_PATH, uploaded_file.name)
-    with open(pdf_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-    st.success(f"PDF {uploaded_file.name} uploaded successfully!")
+        with open(save_pdf_path, "wb") as f:
+            f.write(uploaded_pdf.read())
 
-    user_query = st.text_input("Enter your query:", key="user_query")
+        st.write("Processing your PDF and query...")
+        results = id_main(
+            save_pdf_name=save_pdf_path,
+            user_query=user_query,
+            save_csv_name=save_csv_name
+        )
+        all_response = ''
+        for r in results:
+            all_response += r['text']
 
-    if user_query:
-        save_csv_name = f"{uploaded_file.name.split('.')[0]}_embeddings.csv"
-        save_csv_path = os.path.join(PathSettings.CSV_DB_DIR_PATH, save_csv_name)
-
-        if os.path.exists(save_csv_path):
-            st.write(f"Using existing CSV file: {save_csv_name}")
+        if results:
+            st.write("Here are the relevant results:")
+            for result in results:
+                st.write(f"**Score:** {result['score']}")
+                st.write(f"**Text:** {result['text']}")
+                st.write(f"**Page Number:** {result['page_number']}")
+                st.write("---")
         else:
-            st.write("CSV file not found. Generating embeddings...")
+            st.write("No relevant results found.")
 
-        with st.spinner("Processing your query and generating response..."):
-            # Step 1: Generate RAG response
-            rag_response = intelli_docs_main(
-                user_query=user_query,
-                save_csv_name=save_csv_name,
-                save_csv_dir=PathSettings.CSV_DB_DIR_PATH,
-                rag_device="cpu"
-            )
+        llm_response = gemini_response(
+            user_query=user_query,
+            context=all_response,
+        )
 
-            # Step 2: Generate Gemini response based on RAG response
-            if rag_response:
-                llm_response = gemini_response(user_query, context=rag_response)
-                response = f"{rag_response}\n\nGemini's insights:\n{llm_response}"
-            else:
-                response = "No results found. Please try a different query."
+        if llm_response:
+            st.write("**Here is the result from the LLM:**")
+            st.write(llm_response)
+        else:
+            st.write("No results found.")
 
-        # Append the query and response to the chat log
-        st.session_state.chat_log.append({"query": user_query, "response": response})
 
-# Display chat log
-if st.session_state.chat_log:
-    st.write("### Chat Log")
-    for entry in st.session_state.chat_log:
-        st.write(f"**User:** {entry['query']}")
-        st.write(f"**IntelliDocs:** {entry['response']}")
-        st.write("---")
-
-if st.button("Clear Chat Log"):
-    st.session_state.chat_log = []
-    st.write("Chat log cleared.")
-
-if st.button("Clear Cache and Data"):
-    st.cache_data.clear()
-    st.cache_resource.clear()
-    st.write("Cache and data cleared.")
+if __name__ == "__main__":
+    main()
