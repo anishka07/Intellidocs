@@ -124,6 +124,6 @@ streamlit run ui.py
 
 - **Expand Support**: Extend support to other document formats (e.g., DOCX, TXT).
 - **Web Application**: Create a full stack web application with apis.
-- **Summarization**: Extracted text summarization using Tf-Idf.
+- **Summarization**: Extracted text summarization using Tf-Idf
 
 
