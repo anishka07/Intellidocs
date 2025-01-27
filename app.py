@@ -4,17 +4,13 @@ from functools import wraps
 
 import MySQLdb.cursors
 import bcrypt
-import pandas as pd
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, session, flash, redirect, url_for
 from flask_mysqldb import MySQL
 from flask_socketio import SocketIO, emit
-from sentence_transformers import SentenceTransformer
 from werkzeug.utils import secure_filename
 
-from model.intellidocs_rag_final.chunk_processor import ChunkProcessor
-from model.intellidocs_rag_final.pdf_loader import PdfLoader
-from model.intellidocs_rag_final.retrieval_process import Retriever
+from model.id_rag_w_chromadb.id_chroma_rag_v1 import IntellidocsRAG
 from model.llms.gemini_response import gemini_response
 from utils.constants import PathSettings, ConstantSettings
 
@@ -76,39 +72,34 @@ def upload_pdf():
 
             try:
                 logger.info(f"Starting PDF processing for {filename}")
-                emit('processing_update', {'message': 'Loading PDF...'}, broadcast=True, namespace='/')
+                emit('processing_update', {'message': 'Processing PDF...'}, broadcast=True, namespace='/')
 
-                pdf_loader = PdfLoader(pdf_path=file_path)
-                pages_and_texts = pdf_loader.add_tokenized_sentences()
-                logger.info(f"PDF loaded and tokenized: {len(pages_and_texts)} pages")
-                emit('processing_update', {'message': f'PDF loaded: {len(pages_and_texts)} pages'}, broadcast=True,
-                     namespace='/')
-
-                logger.info("Processing chunks...")
-                emit('processing_update', {'message': 'Processing text chunks...'}, broadcast=True, namespace='/')
-                chunk_processor = ChunkProcessor(pages_and_texts=pages_and_texts, min_token_length=20)
-                filtered_chunks = chunk_processor.filter_chunks_by_token_length()
-                logger.info(f"Chunks processed: {len(filtered_chunks)} chunks")
-
-                logger.info("Generating embeddings...")
-                emit('processing_update', {'message': 'Generating embeddings...'}, broadcast=True, namespace='/')
-                chunk_df = pd.DataFrame(filtered_chunks)
-                embeddings = chunk_processor.data_frame['sentence_chunk'].apply(
-                    lambda x: SentenceTransformer('all-mpnet-base-v2').encode(x).tolist()
+                # Initialize IntellidocsRAG with the uploaded PDF
+                rag = IntellidocsRAG(
+                    pdf_doc_path=file_path,
+                    chunk_size=ConstantSettings.CHUNK_SIZE,
+                    embedding_model=ConstantSettings.EMBEDDING_MODEL_NAME,
+                    chroma_db_dir=PathSettings.CHROMA_DB_PATH
                 )
-                chunk_df['embeddings'] = embeddings
-                chunk_df['model_name'] = 'all-mpnet-base-v2'
 
-                embeddings_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{filename}_embeddings.csv")
-                chunk_df.to_csv(embeddings_path, index=False)
-                logger.info("Embeddings saved")
+                # Check if embeddings for this PDF already exist
+                collection_name = filename  # Use filename as the collection name
+                existing_collection = rag.chroma_client.get_collection(collection_name)
+                if existing_collection is not None:
+                    flash('Embeddings already exist for this PDF. Using existing embeddings.', 'info')
+                else:
+                    # Process the PDF and store embeddings
+                    extracted_text = rag.extract_text_from_document_fitz()
+                    text_chunks = rag.text_chunking(extracted_text)
+                    embeddings = rag.generate_embeddings(text_chunks)
+                    rag.store_embeddings(text_chunks, embeddings, collection_name)
+                    flash('PDF processed and embeddings stored successfully!', 'success')
 
+                # Store session data for retrieval
                 session['pdf_data'] = {
-                    'embeddings_path': embeddings_path,
                     'pdf_path': file_path,
                     'filename': filename,
-                    'num_pages': len(pages_and_texts),
-                    'num_chunks': len(filtered_chunks)
+                    'collection_name': collection_name
                 }
 
                 emit('processing_update', {'message': 'PDF processing complete!'}, broadcast=True, namespace='/')
@@ -127,19 +118,26 @@ def handle_send_message_event(data):
     message = data['message']
     username = session.get('username', 'Guest')
     pdf_data = session.get('pdf_data', {})
-    embeddings_path = pdf_data.get('embeddings_path')
+    collection_name = pdf_data.get('collection_name')
 
-    if not embeddings_path:
+    if not collection_name:
         emit('receive_message', {'message': "Please upload a PDF first", 'username': 'IntelliDocs'}, broadcast=True)
         return
 
     try:
-        retriever = Retriever(embeddings_df_path=embeddings_path)
-        scores, indices = retriever.retrieve_relevant_resources(query=message, n_resources_to_return=3)
+        # Initialize RAG with collection name for retrieval
+        rag = IntellidocsRAG(
+            pdf_doc_path=pdf_data.get('pdf_path'),
+            chunk_size=ConstantSettings.CHUNK_SIZE,
+            embedding_model=ConstantSettings.EMBEDDING_MODEL_NAME,
+            chroma_db_dir=PathSettings.CHROMA_DB_PATH
+        )
 
-        relevant_chunks = [retriever.pages_and_chunks[idx]["sentence_chunk"] for idx in indices]
-        context = " ".join(relevant_chunks)
+        # Retrieve top results using the RAG class
+        top_results = rag.retrieve_top_n(user_query=message, chroma_collection_name=collection_name, top_n=3)
 
+        # Combine retrieved chunks for LLM response
+        context = " ".join([result['chunk'] for result in top_results])
         llm_response = gemini_response(message, context=context)
 
         emit('receive_message', {'message': message, 'username': username}, broadcast=True)
@@ -147,6 +145,7 @@ def handle_send_message_event(data):
     except Exception as e:
         logger.error(f"Error in message processing: {e}")
         emit('receive_message', {'message': "Error processing your request", 'username': 'IntelliDocs'}, broadcast=True)
+
 
 @app.route('/')
 @login_required
