@@ -6,10 +6,10 @@ from tqdm.auto import tqdm
 
 import warnings
 
-from model.intellidocs_rag_final.intellidocs_rag_constants import id_rag_pdf_path, id_pdf_name, \
+from model.intellidocs_rag_v3.intellidocs_rag_constants import id_rag_pdf_path, id_pdf_name, \
     sent_tokenizer_model_name
-from model.intellidocs_rag_final.pdf_loader import pdf_loader_main
-from model.intellidocs_rag_final.chunk_processor import tp_main
+from model.intellidocs_rag_v3.pdf_loader import pdf_loader_main
+from model.intellidocs_rag_v3.chunk_processor import tp_main
 from utils.constants import PathSettings
 
 warnings.filterwarnings("ignore", category=FutureWarning, message=".*clean_up_tokenization_spaces.*")

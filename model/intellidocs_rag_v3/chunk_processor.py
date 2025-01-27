@@ -3,8 +3,8 @@ import re
 import pandas as pd
 from tqdm.auto import tqdm
 
-from model.intellidocs_rag_final.intellidocs_rag_constants import id_rag_pdf_path, id_pdf_name
-from model.intellidocs_rag_final.pdf_loader import pdf_loader_main
+from model.intellidocs_rag_v3.intellidocs_rag_constants import id_rag_pdf_path, id_pdf_name
+from model.intellidocs_rag_v3.pdf_loader import pdf_loader_main
 
 
 class ChunkProcessor:

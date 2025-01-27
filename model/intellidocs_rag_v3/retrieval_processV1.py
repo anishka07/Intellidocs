@@ -2,7 +2,7 @@ import torch
 from pymilvus import connections, Collection
 from sentence_transformers import SentenceTransformer
 
-from model.intellidocs_rag_final.intellidocs_rag_constants import sent_tokenizer_model_name
+from model.intellidocs_rag_v3.intellidocs_rag_constants import sent_tokenizer_model_name
 
 
 class Retriever:

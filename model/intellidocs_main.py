@@ -1,10 +1,10 @@
 import os
 
-from model.intellidocs_rag_final.chunk_processor import ChunkProcessor
-from model.intellidocs_rag_final.embedding_process import EmbeddingProcessor
-from model.intellidocs_rag_final.intellidocs_rag_constants import id_pdf_name
-from model.intellidocs_rag_final.pdf_loader import PdfLoader
-from model.intellidocs_rag_final.retrieval_process import Retriever
+from model.intellidocs_rag_v3.chunk_processor import ChunkProcessor
+from model.intellidocs_rag_v3.embedding_process import EmbeddingProcessor
+from model.intellidocs_rag_v3.intellidocs_rag_constants import id_pdf_name
+from model.intellidocs_rag_v3.pdf_loader import PdfLoader
+from model.intellidocs_rag_v3.retrieval_process import Retriever
 from utils.constants import PathSettings, ConstantSettings
 
 
@@ -54,7 +54,7 @@ def id_main(save_pdf_name: str, user_query: str, save_csv_name: str):
 
 if __name__ == '__main__':
     results = id_main(
-        save_pdf_name=os.path.join(PathSettings.PDF_DIR_PATH, 'intellidocs_rag_final.pdf'),
+        save_pdf_name=os.path.join(PathSettings.PDF_DIR_PATH, 'intellidocs_rag_v3.pdf'),
         user_query="what are macronutrients?",
         save_csv_name='test.csv'
     )

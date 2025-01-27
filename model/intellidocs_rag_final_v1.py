@@ -1,13 +1,13 @@
 import logging
 from pymilvus import utility
-from model.intellidocs_rag_final.chunk_processor import tp_main
-from model.intellidocs_rag_final.embedding_process_V1 import embedding_process_main
-from model.intellidocs_rag_final.intellidocs_rag_constants import (
+from model.intellidocs_rag_v3.chunk_processor import tp_main
+from model.intellidocs_rag_v3.embedding_process_V1 import embedding_process_main
+from model.intellidocs_rag_v3.intellidocs_rag_constants import (
     id_rag_pdf_path, id_pdf_name, sent_tokenizer_model_name
 )
-from model.intellidocs_rag_final.milvus_conn_manager import MilvusConnectionManager
-from model.intellidocs_rag_final.pdf_loader import pdf_loader_main
-from model.intellidocs_rag_final.retrieval_processV1 import retriever_main
+from model.intellidocs_rag_v3.milvus_conn_manager import MilvusConnectionManager
+from model.intellidocs_rag_v3.pdf_loader import pdf_loader_main
+from model.intellidocs_rag_v3.retrieval_processV1 import retriever_main
 from model.llms.llama_response import setup_pipeline
 from utils.constants import PathSettings, ConstantSettings
 

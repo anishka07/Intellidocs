@@ -7,8 +7,8 @@ import numpy as np
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 
-from model.rag_gemini_v1.document_processor import PDFProcessor
-from model.rag_gemini_v1.text_processor import TextProcessor
+from model.intellidocs_rag_v1.document_processor import PDFProcessor
+from model.intellidocs_rag_v1.text_processor import TextProcessor
 from utils.constants import PathSettings, ConstantSettings
 
 load_dotenv()

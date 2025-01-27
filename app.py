@@ -10,7 +10,7 @@ from flask_mysqldb import MySQL
 from flask_socketio import SocketIO, emit
 from werkzeug.utils import secure_filename
 
-from model.id_rag_w_chromadb.id_chroma_rag_v1 import IntellidocsRAG
+from model.intellidocs_rag_final.id_chroma_rag import IntellidocsRAG
 from model.llms.gemini_response import gemini_response
 from utils.constants import PathSettings, ConstantSettings
 

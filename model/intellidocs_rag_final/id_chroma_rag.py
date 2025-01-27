@@ -11,7 +11,8 @@ from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from tqdm.auto import tqdm
 
-from model.intellidocs_rag_final.intellidocs_rag_constants import id_pdf_name
+from model.intellidocs_rag_v3.intellidocs_rag_constants import id_pdf_name
+from model.llms.gemini_response import gemini_response
 from utils.constants import PathSettings, ConstantSettings
 
 logger = logging.getLogger(__name__)
@@ -19,6 +20,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class IntellidocsRAG:
+
     def __init__(self, pdf_doc_path: str, chunk_size: int, embedding_model: str, chroma_db_dir: str) -> None:
         self.pdf_path = pdf_doc_path
         self.chunk_size = chunk_size
@@ -165,9 +167,15 @@ if __name__ == '__main__':
     retriever.store_embeddings(chunks, embeddings, collection_name)
 
     # Retrieve top results for a query
-    query = "What are macro nutrients?"
+    query = "What is statistical learning?"
     results = retriever.retrieve_top_n(query, collection_name, top_n=5)
 
     print("Top results:")
-    for result in results:
-        print(result)
+    print(type(results))
+    print(results[0])
+
+    llm_response = gemini_response(
+        user_query=query,
+        context=results[0],
+    )
+    print(llm_response)
