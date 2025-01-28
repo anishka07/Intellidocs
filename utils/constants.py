@@ -22,6 +22,3 @@ class ConstantSettings:
     ALLOWED_EXTENSIONS = {'pdf'}
     SPACY_LOAD: str = "en_core_web_sm"
 
-
-if __name__ == '__main__':
-    print(PathSettings.CSV_DB_DIR_PATH)
