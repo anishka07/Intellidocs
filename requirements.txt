@@ -20,4 +20,5 @@ flask-socketio~=5.4.1
 transformers~=4.48.1
 chromadb~=0.5.5
 werkzeug~=3.0.4
-matplotlib~=3.9.2
+fastapi~=0.112.1
+nltk~=3.8.1

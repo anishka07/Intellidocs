@@ -214,4 +214,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socket_message.run(app, debug=True)

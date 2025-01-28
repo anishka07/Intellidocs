@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Intellidocs</title>
     <link rel="stylesheet" href="/app/static/style.css">
+    <title>Login - IntelliDocs</title>
     <style>
-        /* General Styles */
         body {
             font-family: Arial, sans-serif;
             background-color: #121212;
@@ -46,58 +45,66 @@
             text-decoration: underline;
         }
 
-        /* Sign-Up Form Styles */
-        .form-container {
+        .auth-section {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
+            margin-top: 100px;
         }
 
-        .form-box {
-            background-color: #2a2a2a;
-            padding: 40px;
-            border-radius: 8px;
-            width: 300px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .form-box h2 {
+        .auth-section h2 {
+            font-size: 28px;
             color: #fff;
-            text-align: center;
-            margin-bottom: 20px;
         }
 
-        .form-box input {
-            width: 100%;
+        .auth-section form {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+        }
+
+        .auth-section input {
             padding: 10px;
             margin: 10px 0;
-            border: none;
             background-color: #333;
             color: #fff;
+            border: none;
             border-radius: 4px;
         }
 
-        .form-box button {
-            width: 100%;
+        .auth-section input::placeholder {
+            color: #b3b3b3;
+        }
+
+        .auth-section button {
             padding: 10px;
             background-color: #f39c12;
+            color: white;
             border: none;
-            color: #fff;
-            font-size: 1rem;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
         }
 
-        .form-box button:hover {
+        .auth-section button:hover {
             background-color: #d87b08;
         }
 
-        .error-message {
-            color: #e74c3c;
-            text-align: center;
+        .signup-option {
+            margin-top: 20px;
+        }
+
+        .signup-option a {
+            color: #f39c12;
+        }
+
+        .signup-option a:hover {
+            text-decoration: underline;
+        }
+
+        .error-msg {
+            color: #ff4d4d;
+            font-size: 12px;
+            margin-top: 10px;
             display: none;
         }
     </style>
@@ -107,28 +114,26 @@
         <h1 class="logo">IntelliDocs</h1>
         <nav>
             <ul>
-                <li><a href="{{ url_for('home.home') }}">Home</a></li>
-                <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
             </ul>
         </nav>
     </header>
+    <main>
+        <section class="auth-section">
+            <h2>Login</h2>
 
-    <div class="form-container">
-        <div class="form-box">
-            <h2>Sign Up</h2>
-
-            <form action="{{ url_for('auth.signup') }}" method="POST">
-                <input type="text" name="username" id="new-username" placeholder="Username" required>
-                <input type="password" name="password" id="new-password" placeholder="Password" required>
-                <input type="password" name="confirm_password" id="confirm-password" placeholder="Confirm Password" required>
+            <form action="{{ url_for('login') }}" method="POST">
+                <input type="text" name="username" id="username" placeholder="Username" required>
+                <input type="password" name="password" id="password" placeholder="Password" required>
+                <button type="submit">Login</button>
 
                 {% if msg %}
                     <p class="error-msg">{{ msg }}</p>
                 {% endif %}
-
-                <button type="submit">Sign Up</button>
             </form>
-        </div>
-    </div>
+
+            <p class="signup-option">Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
+        </section>
+    </main>
 </body>
 </html>

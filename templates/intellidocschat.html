@@ -13,8 +13,8 @@
         <h1 class="logo">IntelliDocs Chat</h1>
         <nav>
             <ul>
-                <li><a href="{{ url_for('home.home') }}">Home</a></li>
-                <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -25,7 +25,7 @@
         <div class="chat-box" id="chat-box">
             <!-- Chat messages will appear here -->
         </div>
-        <form class="chat-form" id="chat-form" method="POST" action="{{ url_for('chat.chat') }}" enctype="multipart/form-data">
+        <form class="chat-form" id="chat-form" method="POST" action="{{ url_for('chat') }}" enctype="multipart/form-data">
             <input type="file" name="pdf" accept="application/pdf" class="upload-input" id="pdf-input">
             <input type="text" name="message" placeholder="Type your query..." class="chat-input" id="chat-input" autocomplete="off">
             <button type="submit" class="send-btn">Send</button>

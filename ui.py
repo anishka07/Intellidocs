@@ -63,21 +63,45 @@ if uploaded_file is not None:
         with st.spinner("Storing embeddings in Chroma DB..."):
             retriever.store_embeddings(st.session_state.chunks, st.session_state.embeddings, collection_name)
             st.success("Embeddings stored in Chroma DB!")
-
+    #
+    # # Query the Chroma DB
+    # st.header("Step 3: Query the Document")
+    # user_query = st.text_input("Enter your query:")
+    # st.session_state.query = user_query
+    # if st.button("Search"):
+    #     with st.spinner("Searching for relevant chunks..."):
+    #         results = retriever.retrieve_top_n(st.session_state.query, collection_name, top_n=5)
+    #         if results:
+    #             st.success(f"Found {len(results)} relevant chunks:")
+    #             for i, result in enumerate(results):
+    #                 st.subheader(f"Result {i + 1}")
+    #                 st.write(f"**Chunk:** {result['chunk'][:500]}...")
+    #                 st.write(f"**Score:** {result['score'][0]}")
+    #         else:
+    #             st.warning("No results found for the query.")
     # Query the Chroma DB
     st.header("Step 3: Query the Document")
     user_query = st.text_input("Enter your query:")
-    st.session_state.query = user_query
+    top_n_results = st.slider("Number of results to display:", min_value=1, max_value=10, value=5)
+
     if st.button("Search"):
-        with st.spinner("Searching for relevant chunks..."):
-            results = retriever.retrieve_top_n(st.session_state.query, collection_name, top_n=5)
-            if results:
-                st.success(f"Found {len(results)} relevant chunks:")
-                for i, result in enumerate(results):
-                    st.subheader(f"Result {i + 1}")
-                    st.write(f"**Chunk:** {result['chunk'][:500]}...")
-                    st.write(f"**Score:** {result['score'][0]}")
-            else:
-                st.warning("No results found for the query.")
+        if not user_query.strip():
+            st.warning("Please enter a valid query before searching.")
+        else:
+            with st.spinner("Searching for relevant chunks..."):
+                try:
+                    results = retriever.retrieve_top_n(user_query, collection_name, top_n=top_n_results)
+                    if results:
+                        st.success(f"Found {len(results)} relevant chunks:")
+                        for i, result in enumerate(results):
+                            # Join the text in 'chunk' into a single string
+                            concatenated_chunk = " ".join(result['chunk'])
+                            with st.expander(f"Result {i + 1} (Score: {result['score'][0]:.4f})"):
+                                st.write(f"**Chunk:** {concatenated_chunk[:500]}...")  # Show the first 500 characters
+                    else:
+                        st.warning("No results found for the query.")
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+
 else:
     st.warning("Please upload a PDF file to get started.")
