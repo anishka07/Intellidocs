@@ -10,3 +10,4 @@ CSV_db
 pickle_models
 uploads
 intellidocs_db
+id_chroma_db

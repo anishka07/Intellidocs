@@ -11,9 +11,7 @@ from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from tqdm.auto import tqdm
 
-from model.intellidocs_rag_v3.intellidocs_rag_constants import id_pdf_name
-from model.llms.gemini_response import gemini_response
-from utils.constants import PathSettings, ConstantSettings
+from utils.constants import ConstantSettings
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -145,37 +143,3 @@ class IntellidocsRAG:
         except Exception as e:
             raise RuntimeError(f"Error retrieving top N results: {e}")
 
-
-if __name__ == '__main__':
-    chroma_dir = os.path.join(PathSettings.CHROMA_DB_PATH)
-    pdf_path = os.path.join(PathSettings.PDF_DIR_PATH, id_pdf_name)
-    collection_name = "intellidocs_collection1"
-
-    retriever = IntellidocsRAG(
-        pdf_doc_path=pdf_path,
-        chunk_size=ConstantSettings.CHUNK_SIZE,
-        embedding_model=ConstantSettings.EMBEDDING_MODEL_NAME,
-        chroma_db_dir=chroma_dir
-    )
-
-    # Extract and chunk text
-    text = retriever.extract_text_from_document_fitz()
-    chunks = retriever.text_chunking(text)
-
-    # Generate embeddings and store them
-    embeddings = retriever.generate_embeddings(chunks)
-    retriever.store_embeddings(chunks, embeddings, collection_name)
-
-    # Retrieve top results for a query
-    query = "What is statistical learning?"
-    results = retriever.retrieve_top_n(query, collection_name, top_n=5)
-
-    print("Top results:")
-    print(type(results))
-    print(results[0])
-
-    llm_response = gemini_response(
-        user_query=query,
-        context=results[0],
-    )
-    print(llm_response)

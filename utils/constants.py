@@ -15,10 +15,10 @@ class ConstantSettings:
     CHROMA_DB_COLLECTION = 'intellidocs_db'
     EMBEDDING_MODEL_NAME: str = 'all-mpnet-base-v2'
     LLM_MODEL_NAME: str = 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'
-    GEMINI_PROMPT = """ Introduce yourself before starting the response. You are a RAG system named Intellidocs. The user using you has this query: {}\n. And this is the query the RAG has generated
+    GEMINI_PROMPT = """ You are a RAG system named Intellidocs. The user using you has this query: {}\n. And this is the query the RAG has generated
     {}\n. Your job is to generate a response on the query based on the context. Make the context similar to the RAG response. Greet me as Intellidocs and answer the question.
     """
-    GEMINI_NC_PROMPT: str = 'Just respond to the query given to you by the user. This is the message the user sent you: {}'
+    GEMINI_NC_PROMPT: str = 'Just respond to the query given to you by the user. This is the query the user sent you: {}'
     ALLOWED_EXTENSIONS = {'pdf'}
     SPACY_LOAD: str = "en_core_web_sm"
 
