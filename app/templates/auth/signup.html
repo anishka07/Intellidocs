@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Intellidocs</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/app/static/style.css">
     <style>
         /* General Styles */
         body {
@@ -107,8 +107,8 @@
         <h1 class="logo">IntelliDocs</h1>
         <nav>
             <ul>
-                <li><a href="{{ url_for('home') }}">Home</a></li>
-                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('home.home') }}">Home</a></li>
+                <li><a href="{{ url_for('auth.login') }}">Login</a></li>
             </ul>
         </nav>
     </header>
@@ -117,7 +117,7 @@
         <div class="form-box">
             <h2>Sign Up</h2>
 
-            <form action="{{ url_for('signup') }}" method="POST">
+            <form action="{{ url_for('auth.signup') }}" method="POST">
                 <input type="text" name="username" id="new-username" placeholder="Username" required>
                 <input type="password" name="password" id="new-password" placeholder="Password" required>
                 <input type="password" name="confirm_password" id="confirm-password" placeholder="Confirm Password" required>

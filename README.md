@@ -16,48 +16,77 @@
 
 - **Programming Language**: `Python`
 - **Libraries**:
-  - `pandas`: For data manipulation and embedding storage in csv format (no vector database used).
-  - `sentence-transformers`: For embedding text chunks.
   - `fitz`: For PDF text extraction.
-  - `Streamlit`: For creating user interface (temporary).
-- **Machine Learning**: Utilizes `pre-trained` embedding model for vector embeddings but does not use vector database for storage.
+  - `sentence-transformers`: For embedding text chunks.
+  - `Streamlit`: For creating the user interface (temporary).
+  - `Chromadb`: For vector database.
+  - `flask`: For backend (w.i.p)
+- **Machine Learning**: Utilizes `pre-trained` embedding model for vector embeddings and uses `chromadb` to store them.
 
 ## Project Structure
 
 ```plaintext
-├── CSV_db
-## your vector embeddings go here
 ├── README.md
+├── app
+│   ├── __init__.py
+│   ├── routes 
+// backend routes 
+│   │   ├── __init__.py
+│   │   ├── auth.py
+│   │   ├── chat.py
+│   │   ├── home.py
+│   │   └── upload.py
+│   ├── static 
+// static files
+│   │   ├── images
+│   │   ├── intellidocsstyle.css
+│   │   └── style.css
+│   ├── templates
+ // html templates
+│   │   ├── auth
+│   │   │   ├── login.html
+│   │   │   └── signup.html
+│   │   ├── index.html
+│   │   └── intellidocschat.html
+│   └── utils
+ // backend utilities
+│       ├── __init__.py
+│       ├── decorators.py
+│       └── helpers.py
+├── app.py // single file backend logic (might delete later)
+├── config
+│   ├── __init__.py
+│   └── settings.py // backend settings.py
+├── id_chroma_db 
+// cached chunks and embedding example
+│   └── cache
+│       ├── 0bed51f0d2edc69a7996e6142e4310d5_chunks.pkl
+│       ├── 0bed51f0d2edc69a7996e6142e4310d5_embeddings.pkl
+├── images
+│   └── ui.png
 ├── model
 │   ├── __init__.py
-│   ├── intellidocs_main.py ## run this to get the gist of how the project 
-works
-│   ├── intellidocs_rag_final ## final RAG version
+│   ├── intellidocs_main.py // Intellidocs main RAG instance
+│   ├── intellidocs_rag_final
 │   │   ├── __init__.py
-│   │   ├── chunk_processor.py
-│   │   ├── cosine_similarity.py
-│   │   ├── embedding_process.py
-│   │   ├── intellidocs_rag_constants.py
-│   │   ├── pdf_loader.py
-│   │   └── retrieval_process.py
-│   ├── intellidocs_rag_v2
-│   │   ├── __init__.py
-│   │   └── intellidocs_RAG_V2.py
-│   └── rag_gemini_v1
+│   │   └── id_chroma_rag.py // Intellidocs RAG main w chromadb
+          // contains other versions of intellidocs RAG as well..
+│   └── llms
 │       ├── __init__.py
-│       ├── document_processor.py
-│       ├── faiss_saver_and_responser.py
-│       └── text_processor.py
-├── notebooks
-│   ├── RAG_from_scratch.ipynb
+│       ├── gemini_response.py // gemini response
+│       └── llama_response.py // llama response
 ├── pdfs
-## your pdf files go here
+// pdf files for testing..
 ├── requirements.txt
-├── ui.py
+├── run.py // backend runpoint
+├── ui.py // streamlit application
+├── uploads
+// backend testing
 └── utils
     ├── __init__.py
-    └── constants.py ## project constants inc. paths 
-
+    ├── cleanup_chroma.py // clean up chroma db
+    ├── constants.py // project constants
+    └── dir_utils.py // directory utilities 
 ```
 
 # Step-by-Step Guide to Clone and Run IntelliDocs
@@ -112,12 +141,14 @@ streamlit run ui.py
 
 ## Streamlit Interface
 
-![Alt Text](images/ui.png)
+![Intellidocs RAG streamlit landing page](images/1.png)
+![Steps involved in RAG with ui](images/2.png)
+![Generation](images/33.png)
 
 ## Usage
 
 1. **Input PDF**: Upload your PDF document using the Streamlit interface (for now).
-2. **Querying**: Enter your query in the provided input field and submit.
+2. **Querying**: Enter your query in the provided query field and submit.
 3. **Results**: The system will return the most relevant text chunks extracted from the PDF based on your query.
 
 ## Future Work

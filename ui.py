@@ -6,7 +6,7 @@ from utils.constants import PathSettings, ConstantSettings
 
 # Streamlit App Title
 st.title("Intellidocs RAG System")
-st.markdown("Upload a PDF, extract text, generate embeddings, and query the document using Chroma DB.")
+st.markdown("AI powered insights for your documents!")
 
 # Sidebar for user inputs
 with st.sidebar:

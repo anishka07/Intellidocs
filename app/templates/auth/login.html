@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/app/static/style.css">
     <title>Login - IntelliDocs</title>
     <style>
         body {
@@ -114,7 +114,7 @@
         <h1 class="logo">IntelliDocs</h1>
         <nav>
             <ul>
-                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+                <li><a href="{{ url_for('auth.signup') }}">Sign Up</a></li>
             </ul>
         </nav>
     </header>
@@ -122,7 +122,7 @@
         <section class="auth-section">
             <h2>Login</h2>
 
-            <form action="{{ url_for('login') }}" method="POST">
+            <form action="{{ url_for('auth.login') }}" method="POST">
                 <input type="text" name="username" id="username" placeholder="Username" required>
                 <input type="password" name="password" id="password" placeholder="Password" required>
                 <button type="submit">Login</button>
@@ -132,7 +132,7 @@
                 {% endif %}
             </form>
 
-            <p class="signup-option">Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
+            <p class="signup-option">Don't have an account? <a href="{{ url_for('auth.signup') }}">Sign Up</a></p>
         </section>
     </main>
 </body>
