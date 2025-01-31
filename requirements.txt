@@ -21,4 +21,3 @@ transformers~=4.48.1
 chromadb~=0.5.5
 werkzeug~=3.0.4
 fastapi~=0.112.1
-nltk~=3.8.1
