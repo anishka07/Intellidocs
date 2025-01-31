@@ -1,10 +1,8 @@
-Phi-3-mini-4k-instruct
 pdfs
 .DS_Store
 __pycache__
 .idea
 db
-LaMini-T5-738M
 .env
 CSV_db
 pickle_models
