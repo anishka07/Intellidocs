@@ -1,107 +1,94 @@
-import streamlit as st
 import os
+import tempfile
 
-from model.intellidocs_rag_final.id_chroma_rag import IntellidocsRAG
-from utils.constants import PathSettings, ConstantSettings
+import fitz
+import streamlit as st
 
-# Streamlit App Title
-st.title("Intellidocs RAG System")
-st.markdown("AI powered insights for your documents!")
+from model.intellidocs_rag_final.id_rag_updated import IntellidocsRAG
+from utils.constants import ConstantSettings, PathSettings
 
-# Sidebar for user inputs
-with st.sidebar:
-    st.header("Configuration")
-    chunk_size = st.number_input("Chunk Size", min_value=100, max_value=1000, value=ConstantSettings.CHUNK_SIZE)
-    embedding_model = st.text_input("Embedding Model", value=ConstantSettings.EMBEDDING_MODEL_NAME)
-    chroma_db_dir = st.text_input("Chroma DB Directory", value=PathSettings.CHROMA_DB_PATH)
-    collection_name = st.text_input("Collection Name", value=ConstantSettings.CHROMA_DB_COLLECTION)
 
-# File Uploader
-uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
+def load_pdf_pages(file_path):
+    """Load PDF pages as images for display."""
+    doc = fitz.open(file_path)  # Open PDF from saved file path
+    return [page.get_pixmap() for page in doc]
 
-if uploaded_file is not None:
-    # Save the uploaded file to a temporary location
-    pdf_path = os.path.join(PathSettings.PDF_DIR_PATH, uploaded_file.name)
-    with open(pdf_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
 
-    # Initialize the IntellidocsRAG instance
-    retriever = IntellidocsRAG(
-        pdf_doc_path=pdf_path,
-        chunk_size=chunk_size,
-        embedding_model=embedding_model,
-        chroma_db_dir=chroma_db_dir
+def main():
+    st.set_page_config(layout="wide", page_title="Intellidocs")
+
+    # Sidebar for PDF selection and configuration
+    st.sidebar.title("Intellidocs: AI powered insights for your documents.")
+
+    # File uploader for PDFs
+    uploaded_pdfs = st.sidebar.file_uploader(
+        "Upload PDFs for analysis",
+        type=["pdf"],
+        accept_multiple_files=True
     )
 
-    # Extract and chunk text
-    st.header("Step 1: Extract and Chunk Text")
-    if st.button("Extract Text"):
-        with st.spinner("Extracting text from the PDF..."):
-            ex_text = retriever.extract_text_from_document_fitz()
-            st.session_state.extracted_text = ex_text
-            st.success("Text extraction complete!")
-            st.text_area("Extracted Text", value=ex_text[:5000] + "...", height=300)
+    if uploaded_pdfs:
+        st.sidebar.subheader("Selected PDFs")
+        st.sidebar.write("Displaying top 5 pages from the PDF")
 
-    if st.button("Chunk Text"):
-        with st.spinner("Chunking text..."):
-            chunks = retriever.text_chunking(extracted_text=st.session_state.extracted_text)
-            st.session_state.chunks = chunks
-            st.success(f"Text chunking complete! {len(chunks)} chunks created.")
-            st.write("Sample Chunks:")
-            for i, chunk in enumerate(chunks[:3]):
-                st.write(f"Chunk {i + 1}: {chunk[:200]}...")
+        temp_dir = tempfile.mkdtemp()  # Create a temporary directory
+        pdf_paths = []
+        pdf_keys = []
 
-    # Generate embeddings and store them
-    st.header("Step 2: Generate and Store Embeddings")
-    if st.button("Generate Embeddings"):
-        with st.spinner("Generating embeddings..."):
-            embeddings = retriever.generate_embeddings(st.session_state.chunks)
-            st.session_state.embeddings = embeddings
-            st.success("Embeddings generated successfully!")
+        for uploaded_file in uploaded_pdfs:
+            # Save uploaded file to temporary location
+            temp_pdf_path = os.path.join(temp_dir, uploaded_file.name)
+            with open(temp_pdf_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
 
-    if st.button("Store Embeddings"):
-        with st.spinner("Storing embeddings in Chroma DB..."):
-            retriever.store_embeddings(st.session_state.chunks, st.session_state.embeddings, collection_name)
-            st.success("Embeddings stored in Chroma DB!")
-    #
-    # # Query the Chroma DB
-    # st.header("Step 3: Query the Document")
-    # user_query = st.text_input("Enter your query:")
-    # st.session_state.query = user_query
-    # if st.button("Search"):
-    #     with st.spinner("Searching for relevant chunks..."):
-    #         results = retriever.retrieve_top_n(st.session_state.query, collection_name, top_n=5)
-    #         if results:
-    #             st.success(f"Found {len(results)} relevant chunks:")
-    #             for i, result in enumerate(results):
-    #                 st.subheader(f"Result {i + 1}")
-    #                 st.write(f"**Chunk:** {result['chunk'][:500]}...")
-    #                 st.write(f"**Score:** {result['score'][0]}")
-    #         else:
-    #             st.warning("No results found for the query.")
-    # Query the Chroma DB
-    st.header("Step 3: Query the Document")
-    user_query = st.text_input("Enter your query:")
-    top_n_results = st.slider("Number of results to display:", min_value=1, max_value=10, value=5)
+            st.sidebar.write(f"📄 {uploaded_file.name}")
 
-    if st.button("Search"):
-        if not user_query.strip():
-            st.warning("Please enter a valid query before searching.")
-        else:
-            with st.spinner("Searching for relevant chunks..."):
-                try:
-                    results = retriever.retrieve_top_n(user_query, collection_name, top_n=top_n_results)
-                    if results:
-                        st.success(f"Found {len(results)} relevant chunks:")
-                        for i, result in enumerate(results):
-                            # Join the text in 'chunk' into a single string
-                            concatenated_chunk = " ".join(result['chunk'])
-                            with st.expander(f"Result {i + 1} (Score: {result['score'][0]:.4f})"):
-                                st.write(f"**Chunk:** {concatenated_chunk[:500]}...")  # Show the first 500 characters
-                    else:
-                        st.warning("No results found for the query.")
-                except Exception as e:
-                    st.error(f"An error occurred: {e}")
+            # Display PDF preview in sidebar
+            pdf_pages = load_pdf_pages(temp_pdf_path)
+            for page_num, page in enumerate(pdf_pages[:5], 1):  # Show first 5 pages
+                st.sidebar.image(page.tobytes(), channels='RGB', caption=f'Page {page_num}', use_column_width=True)
 
-else:
-    st.warning("Please upload a PDF file to get started.")
+            pdf_paths.append(temp_pdf_path)  # Store actual file path
+            pdf_keys.append(uploaded_file.name.replace(".pdf", "_key"))
+
+        # Initialize RAG
+        rag = IntellidocsRAG(
+            pdf_doc_paths=pdf_paths,
+            chunk_size=100,
+            embedding_model=ConstantSettings.EMBEDDING_MODEL_NAME,
+            chroma_db_dir=PathSettings.CHROMA_DB_PATH
+        )
+
+        # Extract text and generate embeddings
+        extracted_texts = rag.extract_text_from_documents_fitz()
+        chunked_texts = rag.text_chunking(extracted_texts)
+        extracted_texts_embeddings = rag.generate_embeddings(chunked_texts)
+        rag.store_embeddings(chunked_texts, extracted_texts_embeddings)
+
+        # PDF Key selection for querying
+        selected_pdf_key = st.sidebar.selectbox("Select PDF Key for Querying", pdf_keys)
+
+        # Centered Query Component
+        st.markdown("<h2 style='text-align: center;'>Query Your Document</h2>", unsafe_allow_html=True)
+
+        col1, col2, col3 = st.columns([1, 2, 1])  # Centering using Streamlit columns
+        with col2:
+            user_query = st.text_input("Enter your query:", key="query_input", help="Type your question here.")
+
+        # Query results
+        if user_query and selected_pdf_key:
+            try:
+                results = rag.retrieve_top_n(user_query, selected_pdf_key, top_n=5)
+                total = ''.join(text for text in results[0]['chunk'])
+                # Center the results
+                with col2:
+                    st.subheader("Query Results")
+                    st.write(total)
+
+
+            except Exception as e:
+                st.error(f"Error retrieving results: {e}")
+
+
+if __name__ == '__main__':
+    main()
