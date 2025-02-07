@@ -1,8 +1,9 @@
+import logging
 import os
 import tempfile
+
 import fitz
 import streamlit as st
-import logging
 
 from model.intellidocs_rag_final.id_rag_updated import IntellidocsRAG
 from model.llms.gemini_response import gemini_response
@@ -16,6 +17,13 @@ def load_pdf_pages(file_path):
     """Load PDF pages as images for display."""
     doc = fitz.open(file_path)
     return [page.get_pixmap() for page in doc]
+
+
+# Initialize RAG
+rag = IntellidocsRAG(
+    chunk_size=400,
+    embedding_model=ConstantSettings.EMBEDDING_MODEL_NAME,
+    chroma_db_dir=PathSettings.CHROMA_DB_PATH)
 
 
 def main():
@@ -73,21 +81,7 @@ def main():
 
             pdf_paths.append(temp_pdf_path)
             pdf_keys.append(uploaded_file.name.replace(".pdf", "_key"))
-
-        # Initialize RAG
-        rag = IntellidocsRAG(
-            pdf_doc_paths=pdf_paths,
-            chunk_size=400,
-            embedding_model=ConstantSettings.EMBEDDING_MODEL_NAME,
-            chroma_db_dir=PathSettings.CHROMA_DB_PATH
-        )
-
-        # Process documents
-        extracted_texts = rag.extract_text_from_documents_fitz()
-        chunked_texts = rag.text_chunking(extracted_texts)
-        extracted_texts_embeddings = rag.generate_embeddings(chunked_texts)
-        rag.store_embeddings(chunked_texts, extracted_texts_embeddings)
-
+            rag.process(pdf_paths)
         # PDF selection for querying
         selected_pdf_key = st.sidebar.selectbox(
             "Select PDF for Querying",

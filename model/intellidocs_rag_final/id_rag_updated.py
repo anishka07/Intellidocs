@@ -18,14 +18,23 @@ logging.basicConfig(level=logging.INFO)
 
 class IntellidocsRAG:
 
-    def __init__(self, pdf_doc_paths: list[str], chunk_size: int, embedding_model: str, chroma_db_dir: str) -> None:
-        self.pdf_paths = pdf_doc_paths
+    def __init__(self, chunk_size: int, embedding_model: str, chroma_db_dir: str) -> None:
         self.chunk_size = chunk_size
         self.embedding_model = SentenceTransformer(embedding_model)
         self.chroma_client = chromadb.Client(Settings(persist_directory=chroma_db_dir))
         self.cache_dir = os.path.join(chroma_db_dir, "cache")
         os.makedirs(self.cache_dir, exist_ok=True)
+        self.pdf_keys = {}
+
+    def process(self, pdf_doc_paths: list[str]):
         self.pdf_keys = {pdf_path: self._get_pdf_key(pdf_path) for pdf_path in pdf_doc_paths}  # Generate unique keys
+        extracted_texts = self.extract_text_from_documents_fitz()
+        chunked_texts = self.text_chunking(extracted_texts)
+        extracted_texts_embeddings = self.generate_embeddings(chunked_texts)
+        self.store_embeddings(chunked_texts, extracted_texts_embeddings)
+
+    def get_pdf_keys(self):
+        return self.pdf_keys.keys()
 
     def _get_pdf_key(self, pdf_path: str) -> str:
         """Generate a unique key for each PDF using its filename (without extension)."""
