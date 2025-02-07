@@ -5,6 +5,7 @@ import streamlit as st
 import logging
 
 from model.intellidocs_rag_final.id_rag_updated import IntellidocsRAG
+from model.llms.gemini_response import gemini_response
 from utils.constants import ConstantSettings, PathSettings
 
 logging.basicConfig(level=logging.INFO)
@@ -54,7 +55,7 @@ def main():
             with pdf_tab:
                 preview_container = st.container()
                 with preview_container:
-                    st.write("PDF Preview")
+                    st.write("PDF Preview (scrollable)")
                     preview_area = st.empty()
                     selected_page = st.slider(
                         "Select page",
@@ -109,23 +110,21 @@ def main():
             # Process query and display results
             if user_query and selected_pdf_key:
                 try:
-                    # results = rag.retrieve_top_n(user_query, selected_pdf_key, top_n=5)
-                    # print(results)
-                    st.write("""
-                    The foods we eat contain nutrients. Nutrients are substances
-                    required by the body to perform its basic functions. Nutrients must
-                    be obtained from our diet, since the human body does not
-                    synthesize or produce them. Nutrients have one or more of three
-                    basic functions: they provide energy, contribute to body structure,
-                    and/or regulate chemical processes in the body. These basic
-                    functions allow us to detect and respond to environmental
-                    surroundings, move, excrete wastes, respire (breathe), grow, and
-                    reproduce. There are six classes of nutrients required for the body
-                    to function and maintain overall health. These are carbohydrates,
-                    lipids, proteins, water, vitamins, and minerals. Foods also contain
-                    non-nutrients that may be harmful (such as natural toxins common
-                    in plant foods and additives like some dyes and preservatives) or
-                    beneficial (such as antioxidants).""")
+                    st.subheader(f"Query Results for {selected_pdf_key}: ")
+                    results = rag.retrieve_top_n(user_query, selected_pdf_key, top_n=5)
+                    print(user_query)
+                    print(selected_pdf_key)
+                    print(results)
+                    results = ''.join(t for t in results[0]['chunk'])
+                    print(results)
+                    st.write(results)
+
+                    st.subheader("Response from LLM: ")
+                    llm_response = gemini_response(
+                        user_query=user_query,
+                        context=results,
+                    )
+                    st.write(llm_response)
                 except Exception as e:
                     st.error(f"Error retrieving results: {str(e)}")
 

@@ -5,14 +5,14 @@ from utils.constants import PathSettings, ConstantSettings
 
 rag = IntellidocsRAG(
     pdf_doc_paths=[
-        os.path.join(PathSettings.PDF_DIR_PATH, 'monopoly.pdf'),
+        os.path.join(PathSettings.PDF_DIR_PATH, 'POM_Unit-1.pdf'),
     ],
     chunk_size=400,
     embedding_model=ConstantSettings.EMBEDDING_MODEL_NAME,
     chroma_db_dir=PathSettings.CHROMA_DB_PATH
 )
 
-user_query = "speed die rules?"
+user_query = "what is the concept of organization?"
 
 if __name__ == '__main__':
     # Step 1: Extract text
@@ -35,12 +35,14 @@ if __name__ == '__main__':
     print("Embeddings stored successfully.")
 
     # Step 5: Retrieve results using the correct pdf_key
-    pdf_key = 'monopoly_key'
+    pdf_key = 'POM_Unit-1_key'
     top_results = rag.retrieve_top_n(
         user_query=user_query,
         pdf_key=pdf_key,
         top_n=10
     )
     all_text = ''.join(text for text in top_results[0]['chunk'])
-    llm_response = gemini_response(user_query=user_query, context=all_text)
-    print(llm_response)
+    print(all_text)
+    # llm_response = gemini_response(user_query=user_query, context=all_text)
+    # print(llm_response)
+    # print()
