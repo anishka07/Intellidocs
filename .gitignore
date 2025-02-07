@@ -1,12 +1,4 @@
-pdfs
 .DS_Store
 __pycache__
 .idea
-db
-.env
-CSV_db
-pickle_models
 uploads
-intellidocs_db
-id_chroma_db
-chroma_db
