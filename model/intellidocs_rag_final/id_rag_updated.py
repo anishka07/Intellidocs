@@ -18,14 +18,23 @@ logging.basicConfig(level=logging.INFO)
 
 class IntellidocsRAG:
 
-    def __init__(self, pdf_doc_paths: list[str], chunk_size: int, embedding_model: str, chroma_db_dir: str) -> None:
-        self.pdf_paths = pdf_doc_paths
+    def __init__(self, chunk_size, embedding_model: str, chroma_db_dir: str) -> None:
         self.chunk_size = chunk_size
         self.embedding_model = SentenceTransformer(embedding_model)
         self.chroma_client = chromadb.Client(Settings(persist_directory=chroma_db_dir))
         self.cache_dir = os.path.join(chroma_db_dir, "cache")
         os.makedirs(self.cache_dir, exist_ok=True)
-        self.pdf_keys = {pdf_path: self._get_pdf_key(pdf_path) for pdf_path in pdf_doc_paths}  # Generate unique keys
+        self.pdf_keys = {}
+
+    def process(self, pdf_doc_paths: list[str]):
+        self.pdf_keys = {pdf_path: self._get_pdf_key(pdf_path) for pdf_path in pdf_doc_paths}
+        extracted_texts = self.extract_text_from_documents_fitz()
+        chunked_texts = self.text_chunking(extracted_texts)
+        extracted_texts_embeddings = self.generate_embeddings(chunked_texts)
+        self.store_embeddings(chunked_texts, extracted_texts_embeddings)
+
+    def get_pdf_keys(self):
+        return self.pdf_keys.keys()
 
     def _get_pdf_key(self, pdf_path: str) -> str:
         """Generate a unique key for each PDF using its filename (without extension)."""
@@ -85,7 +94,7 @@ class IntellidocsRAG:
         chunked_texts = {}
 
         for pdf_key, extracted_text in extracted_texts.items():
-            if extracted_text is None:
+            if not extracted_text:
                 continue
 
             cache_key = f"{pdf_key}_chunks"
@@ -122,6 +131,48 @@ class IntellidocsRAG:
             chunked_texts[pdf_key] = chunks
 
         return chunked_texts
+    # def text_chunking(self, extracted_texts: dict) -> dict:
+    #     """Chunk the extracted text for each unique PDF key."""
+    #     chunked_texts = {}
+    #
+    #     for pdf_key, extracted_text in extracted_texts.items():
+    #         if extracted_text is None:
+    #             continue
+    #
+    #         cache_key = f"{pdf_key}_chunks"
+    #         cached_chunks = self._load_cache(cache_key)
+    #
+    #         if cached_chunks:
+    #             logger.info(f"Loaded text chunks from cache for {pdf_key}.")
+    #             chunked_texts[pdf_key] = cached_chunks
+    #             continue
+    #
+    #         logger.info(f"Chunking extracted text for {pdf_key}...")
+    #         nlp = spacy.load(ConstantSettings.SPACY_LOAD)
+    #         nlp.max_length = max(len(extracted_text), nlp.max_length)
+    #         doc = nlp(extracted_text)
+    #         sentences = [sent.text for sent in doc.sents]
+    #
+    #         chunks = []
+    #         current_chunk = []
+    #         current_length = 0
+    #
+    #         for sentence in tqdm(sentences, desc=f"Chunking {pdf_key}"):
+    #             if current_length + len(sentence) <= self.chunk_size:
+    #                 current_chunk.append(sentence)
+    #                 current_length += len(sentence)
+    #             else:
+    #                 chunks.append(" ".join(current_chunk))
+    #                 current_chunk = [sentence]
+    #                 current_length = len(sentence)
+    #
+    #         if current_chunk:
+    #             chunks.append(" ".join(current_chunk))
+    #
+    #         self._save_cache(cache_key, chunks)
+    #         chunked_texts[pdf_key] = chunks
+    #
+    #     return chunked_texts
 
     def generate_embeddings(self, chunked_texts: dict, batch_size: int = 16) -> dict:
         """Generate embeddings for text chunks and store them using unique keys."""
@@ -173,6 +224,7 @@ class IntellidocsRAG:
             collection = self.chroma_client.get_or_create_collection(collection_name)
             query_embedding = self.embedding_model.encode([user_query]).tolist()[0]
             results = collection.query(query_embeddings=[query_embedding], n_results=top_n)
+            print(results)
 
             if not results["documents"]:
                 return []
