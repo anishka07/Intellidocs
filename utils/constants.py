@@ -11,7 +11,6 @@ class PathSettings:
 
 class ConstantSettings:
     CHUNK_SIZE: int = 100
-    CHROMA_DB_COLLECTION = 'intellidocs_db'
     EMBEDDING_MODEL_NAME: str = 'all-mpnet-base-v2'
     LLM_MODEL_NAME: str = 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'
     GEMINI_PROMPT = """ You are a RAG. This is the context provided to you by the user: {}\n. This is the query provided to you by the user: {}\n.
