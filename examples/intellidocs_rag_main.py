@@ -4,15 +4,15 @@ from model.llms.gemini_response import gemini_response
 from utils.constants import PathSettings, ConstantSettings
 
 rag = IntellidocsRAG(
-    pdf_doc_paths=[
-        os.path.join(PathSettings.PDF_DIR_PATH, 'POM_Unit-1.pdf'),
-    ],
     chunk_size=400,
     embedding_model=ConstantSettings.EMBEDDING_MODEL_NAME,
     chroma_db_dir=PathSettings.CHROMA_DB_PATH
 )
+rag.process(pdf_doc_paths=[
+        os.path.join(PathSettings.PDF_DIR_PATH, 'nlp.pdf'),
+    ],)
 
-user_query = "what is the concept of organization?"
+user_query = "what is nlp?"
 
 if __name__ == '__main__':
     # Step 1: Extract text
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     print("Embeddings stored successfully.")
 
     # Step 5: Retrieve results using the correct pdf_key
-    pdf_key = 'POM_Unit-1_key'
+    pdf_key = 'nlp_key'
     top_results = rag.retrieve_top_n(
         user_query=user_query,
         pdf_key=pdf_key,
