@@ -58,6 +58,56 @@ class IntellidocsRAG:
         with open(cache_path, "wb") as cache_file:
             pickle.dump(data, cache_file)
 
+    def extract_text_from_documents_pdfreader(self) -> dict:
+        """Extract text from multiple PDFs using pdfreader and store it using unique keys."""
+        from pdfreader import SimplePDFViewer
+
+        extracted_texts = {}
+        for pdf_path, pdf_key in self.pdf_keys.items():
+            cache_key = f"{pdf_key}_text"
+            cached_text = self._load_cache(cache_key)
+
+            if cached_text:
+                logger.info(f"Loaded extracted text from cache for {pdf_path}.")
+                extracted_texts[pdf_key] = cached_text
+                continue
+
+            try:
+                logger.info(f"Extracting text from {pdf_path}...")
+                with open(pdf_path, 'rb') as file:
+                    viewer = SimplePDFViewer(file)
+                    text_chunks = []
+
+                    # Process each page
+                    page_count = 0
+                    while True:
+                        try:
+                            viewer.render()
+                            text_chunks.extend(viewer.canvas.strings)
+                            viewer.next()
+                            page_count += 1
+                            logger.info(f"Processed page {page_count} of {pdf_path}")
+                        except Exception as e:
+                            if "no more pages" in str(e).lower():
+                                break
+                            else:
+                                raise e
+
+                all_text = ' '.join(text_chunks)
+
+                if not all_text.strip():
+                    logger.warning(f"No text could be extracted from {pdf_path}.")
+                    extracted_texts[pdf_key] = None
+                else:
+                    extracted_texts[pdf_key] = all_text
+                    self._save_cache(cache_key, all_text)  # Cache extracted text
+
+            except Exception as e:
+                logger.error(f"Failed to extract text from {pdf_path}: {e}")
+                extracted_texts[pdf_key] = None
+
+        return extracted_texts
+
     def extract_text_from_documents_fitz(self) -> dict:
         """Extract text from multiple PDFs and store it using unique keys."""
         extracted_texts = {}
@@ -174,21 +224,72 @@ class IntellidocsRAG:
         except Exception as e:
             raise RuntimeError(f"Error storing embeddings in ChromaDB: {e}")
 
+    # def retrieve_top_n(self, user_query: str, pdf_key: str, top_n: int = 5) -> list[dict]:
+    #     """Retrieve top N results for a query, filtered by a specific PDF."""
+    #     logger.info(f"Retrieving top {top_n} results for {pdf_key}...")
+    #     try:
+    #         collection_name = f"pdf_{pdf_key}"
+    #         collection = self.chroma_client.get_or_create_collection(collection_name)
+    #         query_embedding = self.embedding_model.encode([user_query]).tolist()[0]
+    #         results = collection.query(query_embeddings=[query_embedding], n_results=top_n)
+    #
+    #         if not results["documents"]:
+    #             return []
+    #
+    #         return [
+    #             {"chunk": doc, "score": score}
+    #             for doc, score in zip(results["documents"], results["distances"])
+    #         ]
+    #
+    #     except Exception as e:
+    #         raise RuntimeError(f"Error retrieving results for {pdf_key}: {e}")
+
     def retrieve_top_n(self, user_query: str, pdf_key: str, top_n: int = 5) -> list[dict]:
-        """Retrieve top N results for a query, filtered by a specific PDF."""
+        """
+        Retrieve top N unique results for a query, filtered by a specific PDF.
+        Returns deduplicated chunks while maintaining relevance order.
+        """
         logger.info(f"Retrieving top {top_n} results for {pdf_key}...")
         try:
             collection_name = f"pdf_{pdf_key}"
             collection = self.chroma_client.get_or_create_collection(collection_name)
             query_embedding = self.embedding_model.encode([user_query]).tolist()[0]
-            results = collection.query(query_embeddings=[query_embedding], n_results=top_n)
+
+            # Request more results initially to account for potential duplicates
+            buffer_size = top_n * 3
+            results = collection.query(
+                query_embeddings=[query_embedding],
+                n_results=buffer_size
+            )
 
             if not results["documents"]:
                 return []
 
-            return [
-                {"chunk": doc, "score": score}
-                for doc, score in zip(results["documents"], results["distances"])
-            ]
+            # Create a list to store unique chunks while preserving order
+            unique_results = []
+            seen_chunks = set()
+
+            for doc, score in zip(results["documents"][0], results["distances"][0]):
+                # Convert chunk to a hashable format (string) for deduplication
+                chunk_text = str(doc).strip()
+
+                # Only add if we haven't seen this chunk before
+                if chunk_text not in seen_chunks:
+                    seen_chunks.add(chunk_text)
+                    unique_results.append({
+                        "chunk": doc,
+                        "score": float(score)  # Convert numpy float to Python float if necessary
+                    })
+
+                    # Break if we have enough unique results
+                    if len(unique_results) >= top_n:
+                        break
+
+            return unique_results
+
         except Exception as e:
+            logger.error(f"Error retrieving results for {pdf_key}: {e}")
             raise RuntimeError(f"Error retrieving results for {pdf_key}: {e}")
+
+
+

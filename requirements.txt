@@ -4,7 +4,7 @@ numpy~=1.26.4
 python-dotenv~=1.0.1
 sentence-transformers~=3.1.0
 requests~=2.32.3
-spacy
+spacy~=3.7.6
 tqdm~=4.66.5
 pandas~=2.2.2
 scikit-learn~=1.5.1
@@ -20,4 +20,5 @@ flask-socketio~=5.4.1
 transformers~=4.48.1
 chromadb~=0.5.5
 werkzeug~=3.0.4
-fastapi~=0.112.1
+
+nltk~=3.8.1

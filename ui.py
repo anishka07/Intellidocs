@@ -106,19 +106,27 @@ def main():
                 try:
                     st.subheader(f"Query Results for {selected_pdf_key}: ")
                     results = rag.retrieve_top_n(user_query, selected_pdf_key, top_n=5)
-                    print(user_query)
-                    print(selected_pdf_key)
+                    # print(user_query)
+                    # print(selected_pdf_key)
+                    # print(results)
+                    # results = ''.join(t for t in results[0]['chunk'])
                     print(results)
-                    results = ''.join(t for t in results[0]['chunk'])
-                    print(results)
-                    st.write(results)
+                    texts = []
+                    for items in results:
+                        texts.append(items["chunk"])
+                    rag_response = ""
+                    for text in texts:
+                        rag_response += text
+                    st.write(rag_response)
+                    print(rag_response)
+                    # st.write(results)
 
                     st.subheader("Response from LLM: ")
-                    llm_response = gemini_response(
-                        user_query=user_query,
-                        context=results,
-                    )
-                    st.write(llm_response)
+                    # llm_response = gemini_response(
+                    #     user_query=user_query,
+                    #     context=results,
+                    # )
+                    # st.write(llm_response)
                 except Exception as e:
                     st.error(f"Error retrieving results: {str(e)}")
 
