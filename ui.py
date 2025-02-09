@@ -106,27 +106,30 @@ def main():
                 try:
                     st.subheader(f"Query Results for {selected_pdf_key}: ")
                     results = rag.retrieve_top_n(user_query, selected_pdf_key, top_n=5)
-                    # print(user_query)
-                    # print(selected_pdf_key)
-                    # print(results)
-                    # results = ''.join(t for t in results[0]['chunk'])
-                    print(results)
-                    texts = []
-                    for items in results:
-                        texts.append(items["chunk"])
-                    rag_response = ""
-                    for text in texts:
-                        rag_response += text
-                    st.write(rag_response)
-                    print(rag_response)
-                    # st.write(results)
-
+                    if not results:
+                        st.write("No results found.")
+                    top_texts = []
+                    for item in results:
+                        chunk = item['chunk'].strip()
+                        score = item['score']
+                        top_texts.append(
+                            {
+                                'text': chunk,
+                                'score': score
+                            }
+                        )
+                    st.write("Retrieved Chunks (ordered by relevance): ")
+                    st.write("-" * 80)
+                    for i, item in enumerate(top_texts, 1):
+                        st.write(f"\nChunk {i} (Similarity: {item['score']:.4f})")
+                        st.write(item['text'])
+                        st.write("-" * 80)
                     st.subheader("Response from LLM: ")
-                    # llm_response = gemini_response(
-                    #     user_query=user_query,
-                    #     context=results,
-                    # )
-                    # st.write(llm_response)
+                    llm_response = gemini_response(
+                        user_query=user_query,
+                        context=top_texts,
+                    )
+                    st.write(llm_response)
                 except Exception as e:
                     st.error(f"Error retrieving results: {str(e)}")
 
