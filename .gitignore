@@ -2,3 +2,6 @@
 __pycache__
 .idea
 uploads
+id_chroma_db
+pdfs
+.env

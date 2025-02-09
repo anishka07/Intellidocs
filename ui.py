@@ -103,7 +103,7 @@ def main():
             if user_query and selected_pdf_key:
                 try:
                     st.subheader(f"Query Results for {selected_pdf_key}: ")
-                    results = rag.retrieve_top_n(user_query, selected_pdf_key, top_n=10)
+                    results = rag.retrieve_top_n_custom(user_query, selected_pdf_key, top_n=10)
                     st.subheader("Response from LLM: ")
                     top_texts = []
                     for item in results:
@@ -123,7 +123,7 @@ def main():
                     if not results:
                         st.write("No results found.")
                     else:
-                        st.write("Retrieved Chunks (ordered by relevance): ")
+                        st.subheader("Retrieved Chunks (ordered by relevance): ")
                         st.write("-" * 80)
                         for i, item in enumerate(top_texts, 1):
                             st.write(f"\nChunk {i} (Similarity Score: {item['score']:.4f})")
