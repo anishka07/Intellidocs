@@ -6,6 +6,7 @@ import uuid
 import chromadb
 import fitz
 import spacy
+import numpy as np
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from tqdm.auto import tqdm
@@ -16,12 +17,16 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+
 class IntellidocsRAG:
 
     def __init__(self, chunk_size: int, embedding_model: str, chroma_db_dir: str) -> None:
         self.chunk_size = chunk_size
         self.embedding_model = SentenceTransformer(embedding_model)
-        self.chroma_client = chromadb.Client(Settings(persist_directory=chroma_db_dir))
+        self.chroma_client = chromadb.Client(Settings(persist_directory=chroma_db_dir, anonymized_telemetry=False))
         self.cache_dir = os.path.join(chroma_db_dir, "cache")
         os.makedirs(self.cache_dir, exist_ok=True)
         self.pdf_keys = {}
@@ -213,7 +218,11 @@ class IntellidocsRAG:
         try:
             for pdf_key, text_chunks in chunked_texts.items():
                 collection_name = f"pdf_{pdf_key}"
-                collection = self.chroma_client.get_or_create_collection(name=collection_name)
+                collection = self.chroma_client.get_or_create_collection(
+                    name=collection_name,
+                    metadata={"hnsw:space": "cosine"},
+                    embedding_function=None
+                )
 
                 collection.add(
                     documents=text_chunks,
@@ -224,72 +233,35 @@ class IntellidocsRAG:
         except Exception as e:
             raise RuntimeError(f"Error storing embeddings in ChromaDB: {e}")
 
-    # def retrieve_top_n(self, user_query: str, pdf_key: str, top_n: int = 5) -> list[dict]:
-    #     """Retrieve top N results for a query, filtered by a specific PDF."""
-    #     logger.info(f"Retrieving top {top_n} results for {pdf_key}...")
-    #     try:
-    #         collection_name = f"pdf_{pdf_key}"
-    #         collection = self.chroma_client.get_or_create_collection(collection_name)
-    #         query_embedding = self.embedding_model.encode([user_query]).tolist()[0]
-    #         results = collection.query(query_embeddings=[query_embedding], n_results=top_n)
-    #
-    #         if not results["documents"]:
-    #             return []
-    #
-    #         return [
-    #             {"chunk": doc, "score": score}
-    #             for doc, score in zip(results["documents"], results["distances"])
-    #         ]
-    #
-    #     except Exception as e:
-    #         raise RuntimeError(f"Error retrieving results for {pdf_key}: {e}")
+    def retrieve_top_n_custom(self, user_query: str, pdf_key: str, top_n: int = 5) -> list[dict]:
+        """Manually compute cosine similarity and retrieve top N results."""
+        logger.info(f"Retrieving top {top_n} results for {pdf_key} using custom cosine similarity...")
 
-    def retrieve_top_n(self, user_query: str, pdf_key: str, top_n: int = 5) -> list[dict]:
-        """
-        Retrieve top N unique results for a query, filtered by a specific PDF.
-        Returns deduplicated chunks while maintaining relevance order.
-        """
-        logger.info(f"Retrieving top {top_n} results for {pdf_key}...")
         try:
             collection_name = f"pdf_{pdf_key}"
-            collection = self.chroma_client.get_or_create_collection(collection_name)
-            query_embedding = self.embedding_model.encode([user_query]).tolist()[0]
-
-            # Request more results initially to account for potential duplicates
-            buffer_size = top_n * 3
-            results = collection.query(
-                query_embeddings=[query_embedding],
-                n_results=buffer_size
+            collection = self.chroma_client.get_or_create_collection(
+                name=collection_name,
+                metadata={"hnsw:space": "cosine"},
+                embedding_function=None
             )
+
+            query_embedding = self.embedding_model.encode([user_query]).tolist()[0]
+            results = collection.get(include=["embeddings", "documents"])
 
             if not results["documents"]:
                 return []
 
-            # Create a list to store unique chunks while preserving order
-            unique_results = []
-            seen_chunks = set()
+            # Compute cosine similarity for each document
+            similarities = []
+            for doc_embedding, doc_text in zip(results["embeddings"], results["documents"]):
+                similarity = cosine_similarity(query_embedding, doc_embedding)
+                similarities.append({"chunk": doc_text, "score": similarity})
 
-            for doc, score in zip(results["documents"][0], results["distances"][0]):
-                # Convert chunk to a hashable format (string) for deduplication
-                chunk_text = str(doc).strip()
-
-                # Only add if we haven't seen this chunk before
-                if chunk_text not in seen_chunks:
-                    seen_chunks.add(chunk_text)
-                    unique_results.append({
-                        "chunk": doc,
-                        "score": float(score)  # Convert numpy float to Python float if necessary
-                    })
-
-                    # Break if we have enough unique results
-                    if len(unique_results) >= top_n:
-                        break
-
-            return unique_results
+            # Sort by similarity and return top N
+            similarities.sort(key=lambda x: x["score"], reverse=True)
+            return similarities[:top_n]
 
         except Exception as e:
             logger.error(f"Error retrieving results for {pdf_key}: {e}")
             raise RuntimeError(f"Error retrieving results for {pdf_key}: {e}")
-
-
 

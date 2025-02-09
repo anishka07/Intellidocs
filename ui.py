@@ -1,8 +1,8 @@
+import base64
 import logging
 import os
 import tempfile
 
-import fitz
 import streamlit as st
 
 from model.intellidocs_rag_final.id_rag_updated import IntellidocsRAG
@@ -12,18 +12,18 @@ from utils.constants import ConstantSettings, PathSettings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
-def load_pdf_pages(file_path):
-    """Load PDF pages as images for display."""
-    doc = fitz.open(file_path)
-    return [page.get_pixmap() for page in doc]
-
-
 # Initialize RAG
 rag = IntellidocsRAG(
-    chunk_size=400,
+    chunk_size=ConstantSettings.CHUNK_SIZE,
     embedding_model=ConstantSettings.EMBEDDING_MODEL_NAME,
     chroma_db_dir=PathSettings.CHROMA_DB_PATH)
+
+
+def load_pdf_as_base64(file_path):
+    """Convert PDF file to base64 string."""
+    with open(file_path, "rb") as f:
+        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+    return base64_pdf
 
 
 def main():
@@ -56,32 +56,30 @@ def main():
             with open(temp_pdf_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
 
-            # Load PDF pages
-            pdf_pages = load_pdf_pages(temp_pdf_path)
+            # Convert PDF to base64
+            base64_pdf = load_pdf_as_base64(temp_pdf_path)
 
-            # Create scrollable container for PDF preview
+            # Create PDF viewer in tab
             with pdf_tab:
-                preview_container = st.container()
-                with preview_container:
-                    st.write("PDF Preview (scrollable)")
-                    preview_area = st.empty()
-                    selected_page = st.slider(
-                        "Select page",
-                        1,
-                        len(pdf_pages),
-                        1,
-                        key=f"page_slider_{idx}"
-                    )
-                    # Display selected page
-                    preview_area.image(
-                        pdf_pages[selected_page - 1].tobytes(),
-                        caption=f'Page {selected_page}',
-                        use_column_width=True
-                    )
+                # PDF viewer with custom HTML and CSS
+                pdf_viewer_html = f"""
+                    <div style="display: flex; justify-content: center; width: 100%;">
+                        <iframe
+                            src="data:application/pdf;base64,{base64_pdf}"
+                            width="100%"
+                            height="600px"
+                            style="border: 1px solid #ccc; border-radius: 5px;"
+                            type="application/pdf"
+                        >
+                        </iframe>
+                    </div>
+                """
+                st.markdown(pdf_viewer_html, unsafe_allow_html=True)
 
             pdf_paths.append(temp_pdf_path)
             pdf_keys.append(uploaded_file.name.replace(".pdf", "_key"))
             rag.process(pdf_paths)
+
         # PDF selection for querying
         selected_pdf_key = st.sidebar.selectbox(
             "Select PDF for Querying",
@@ -105,9 +103,8 @@ def main():
             if user_query and selected_pdf_key:
                 try:
                     st.subheader(f"Query Results for {selected_pdf_key}: ")
-                    results = rag.retrieve_top_n(user_query, selected_pdf_key, top_n=5)
-                    if not results:
-                        st.write("No results found.")
+                    results = rag.retrieve_top_n(user_query, selected_pdf_key, top_n=10)
+                    st.subheader("Response from LLM: ")
                     top_texts = []
                     for item in results:
                         chunk = item['chunk'].strip()
@@ -118,18 +115,21 @@ def main():
                                 'score': score
                             }
                         )
-                    st.write("Retrieved Chunks (ordered by relevance): ")
-                    st.write("-" * 80)
-                    for i, item in enumerate(top_texts, 1):
-                        st.write(f"\nChunk {i} (Similarity: {item['score']:.4f})")
-                        st.write(item['text'])
-                        st.write("-" * 80)
-                    st.subheader("Response from LLM: ")
                     llm_response = gemini_response(
                         user_query=user_query,
                         context=top_texts,
                     )
                     st.write(llm_response)
+                    if not results:
+                        st.write("No results found.")
+                    else:
+                        st.write("Retrieved Chunks (ordered by relevance): ")
+                        st.write("-" * 80)
+                        for i, item in enumerate(top_texts, 1):
+                            st.write(f"\nChunk {i} (Similarity Score: {item['score']:.4f})")
+                            st.write(item['text'])
+                            st.write("-" * 80)
+
                 except Exception as e:
                     st.error(f"Error retrieving results: {str(e)}")
 

@@ -18,7 +18,7 @@ mysqlclient~=2.2.4
 bcrypt~=4.2.0
 flask-socketio~=5.4.1
 transformers~=4.48.1
-chromadb~=0.5.5
 werkzeug~=3.0.4
 
 nltk~=3.8.1
+chromadb~=0.6.3

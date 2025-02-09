@@ -9,10 +9,10 @@ rag = IntellidocsRAG(
     chroma_db_dir=PathSettings.CHROMA_DB_PATH
 )
 rag.process(pdf_doc_paths=[
-        os.path.join(PathSettings.PDF_DIR_PATH, 'monopoly.pdf'),
+        os.path.join(PathSettings.PDF_DIR_PATH, 'POM_Unit-1.pdf'),
     ],)
 
-user_query = "what are the monopoly speed die rules?"
+user_query = "what is organization goals?"
 
 if __name__ == '__main__':
     # Step 1: Extract text
@@ -34,41 +34,16 @@ if __name__ == '__main__':
     print("Embeddings stored successfully.")
 
     # Step 5: Retrieve results using the correct pdf_key
-    pdf_key = 'monopoly_key'
-    try:
-        top_results = rag.retrieve_top_n(
-            user_query=user_query,
-            pdf_key=pdf_key,
-            top_n=10
-        )
-
-        if not top_results:
-            print("No relevant chunks found.")
-        else:
-            top_texts = []
-            for item in top_results:
-                chunk = item['chunk'].strip()
-                score = item['score']
-                top_texts.append({
-                    'text': chunk,
-                    'score': score
-                })
-
-            print("\nRetrieved Chunks (ordered by relevance):")
-            print("-" * 80)
-            for i, item in enumerate(top_texts, 1):
-                print(f"\nChunk {i} (Similarity Score: {item['score']:.4f}):")
-                print(item['text'])
-                print("-" * 80)
-
-    except Exception as e:
-        print(f"Error retrieving results: {e}")
+    pdf_key = 'POM_Unit-1_key'
+    top_results = rag.retrieve_top_n_custom(
+        user_query=user_query,
+        pdf_key=pdf_key,
+        top_n=10
+    )
+    print(top_results)
     # top_results = rag.retrieve_top_n(
     #     user_query=user_query,
     #     pdf_key=pdf_key,
     #     top_n=5,
     # )
     # print(top_results)
-
-
-

@@ -116,7 +116,7 @@ class IntellidocsRAG:
     def store_embeddings(self, text_chunks: list[str], embeddings: list[list[float]], collection_name: str) -> None:
         logger.info("Storing embeddings...")
         try:
-            collection = self.chroma_client.get_or_create_collection(name=collection_name)
+            collection = self.chroma_client.get_or_create_collection(name=collection_name, metadata={"hnsw:space": "cosine"})
             collection.add(
                 documents=text_chunks,
                 embeddings=embeddings,
@@ -129,7 +129,7 @@ class IntellidocsRAG:
     def retrieve_top_n(self, user_query: str, chroma_collection_name: str, top_n: int = 5) -> list[dict]:
         logger.info("Retrieving top n results...")
         try:
-            collection = self.chroma_client.get_or_create_collection(chroma_collection_name)
+            collection = self.chroma_client.get_or_create_collection(chroma_collection_name, metadata={"hnsw:space": "cosine"})
             query_embedding = self.embedding_model.encode([user_query]).tolist()[0]
             results = collection.query(query_embeddings=[query_embedding], n_results=top_n)
 
