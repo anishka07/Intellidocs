@@ -16,11 +16,10 @@ user_query = "what is organization goals?"
 
 if __name__ == '__main__':
     # Step 1: Extract text
-    # extracted_texts = rag.extract_text_from_documents_fitz()
-    extracted_texts1 = rag.extract_text_from_documents_pdfreader()
+    extracted_texts = rag.extract_text_from_documents_fitz()
 
     # Step 2: Chunk text
-    chunked_texts = rag.text_chunking(extracted_texts1)
+    chunked_texts = rag.text_chunking(extracted_texts)
 
     extracted_texts_embeddings = rag.generate_embeddings(
         chunked_texts=chunked_texts,
@@ -38,12 +37,7 @@ if __name__ == '__main__':
     top_results = rag.retrieve_top_n_custom(
         user_query=user_query,
         pdf_key=pdf_key,
-        top_n=10
+        top_n=5
     )
-    print(top_results)
-    # top_results = rag.retrieve_top_n(
-    #     user_query=user_query,
-    #     pdf_key=pdf_key,
-    #     top_n=5,
-    # )
-    # print(top_results)
+    for result in top_results:
+        print(result)

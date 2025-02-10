@@ -63,56 +63,6 @@ class IntellidocsRAG:
         with open(cache_path, "wb") as cache_file:
             pickle.dump(data, cache_file)
 
-    def extract_text_from_documents_pdfreader(self) -> dict:
-        """Extract text from multiple PDFs using pdfreader and store it using unique keys."""
-        from pdfreader import SimplePDFViewer
-
-        extracted_texts = {}
-        for pdf_path, pdf_key in self.pdf_keys.items():
-            cache_key = f"{pdf_key}_text"
-            cached_text = self._load_cache(cache_key)
-
-            if cached_text:
-                logger.info(f"Loaded extracted text from cache for {pdf_path}.")
-                extracted_texts[pdf_key] = cached_text
-                continue
-
-            try:
-                logger.info(f"Extracting text from {pdf_path}...")
-                with open(pdf_path, 'rb') as file:
-                    viewer = SimplePDFViewer(file)
-                    text_chunks = []
-
-                    # Process each page
-                    page_count = 0
-                    while True:
-                        try:
-                            viewer.render()
-                            text_chunks.extend(viewer.canvas.strings)
-                            viewer.next()
-                            page_count += 1
-                            logger.info(f"Processed page {page_count} of {pdf_path}")
-                        except Exception as e:
-                            if "no more pages" in str(e).lower():
-                                break
-                            else:
-                                raise e
-
-                all_text = ' '.join(text_chunks)
-
-                if not all_text.strip():
-                    logger.warning(f"No text could be extracted from {pdf_path}.")
-                    extracted_texts[pdf_key] = None
-                else:
-                    extracted_texts[pdf_key] = all_text
-                    self._save_cache(cache_key, all_text)  # Cache extracted text
-
-            except Exception as e:
-                logger.error(f"Failed to extract text from {pdf_path}: {e}")
-                extracted_texts[pdf_key] = None
-
-        return extracted_texts
-
     def extract_text_from_documents_fitz(self) -> dict:
         """Extract text from multiple PDFs and store it using unique keys."""
         extracted_texts = {}
@@ -164,23 +114,29 @@ class IntellidocsRAG:
             nlp = spacy.load(ConstantSettings.SPACY_LOAD)
             nlp.max_length = max(len(extracted_text), nlp.max_length)
             doc = nlp(extracted_text)
-            sentences = [sent.text for sent in doc.sents]
+            sentences = [sent.text.strip() for sent in doc.sents if sent.text.strip()]  # Remove empty sentences
 
             chunks = []
             current_chunk = []
             current_length = 0
 
             for sentence in tqdm(sentences, desc=f"Chunking {pdf_key}"):
-                if current_length + len(sentence) <= self.chunk_size:
+                sentence_length = len(sentence)
+                if current_length + sentence_length <= self.chunk_size:
                     current_chunk.append(sentence)
-                    current_length += len(sentence)
+                    current_length += sentence_length
                 else:
-                    chunks.append(" ".join(current_chunk))
-                    current_chunk = [sentence]
-                    current_length = len(sentence)
+                    if current_chunk:  # Ensure we don't add empty chunks
+                        chunk_text = " ".join(current_chunk)
+                        if chunk_text not in chunks:  # Avoid duplicate chunks
+                            chunks.append(chunk_text)
+                    current_chunk = [sentence]  # Start a new chunk with the current sentence
+                    current_length = sentence_length
 
-            if current_chunk:
-                chunks.append(" ".join(current_chunk))
+            if current_chunk:  # Add the last chunk if it's not empty
+                chunk_text = " ".join(current_chunk)
+                if chunk_text not in chunks:  # Avoid duplicate chunks
+                    chunks.append(chunk_text)
 
             self._save_cache(cache_key, chunks)
             chunked_texts[pdf_key] = chunks
@@ -224,12 +180,27 @@ class IntellidocsRAG:
                     embedding_function=None
                 )
 
-                collection.add(
-                    documents=text_chunks,
-                    embeddings=embeddings_dict[pdf_key],
-                    ids=[str(uuid.uuid4()) for _ in text_chunks],
-                )
-                logger.info(f"Stored embeddings for {pdf_key}.")
+                # Check for existing documents in the collection
+                existing_documents = collection.get(include=["documents"])["documents"]
+
+                # Only add chunks that are not already in the collection
+                unique_chunks = []
+                unique_embeddings = []
+                for chunk, embedding in zip(text_chunks, embeddings_dict[pdf_key]):
+                    if chunk not in existing_documents:
+                        unique_chunks.append(chunk)
+                        unique_embeddings.append(embedding)
+
+                if unique_chunks:
+                    collection.add(
+                        documents=unique_chunks,
+                        embeddings=unique_embeddings,
+                        ids=[str(uuid.uuid4()) for _ in unique_chunks],
+                    )
+                    logger.info(f"Stored {len(unique_chunks)} new embeddings for {pdf_key}.")
+                else:
+                    logger.info(f"No new chunks to store for {pdf_key}.")
+
         except Exception as e:
             raise RuntimeError(f"Error storing embeddings in ChromaDB: {e}")
 
@@ -253,9 +224,12 @@ class IntellidocsRAG:
 
             # Compute cosine similarity for each document
             similarities = []
+            seen_chunks = set()  # Track seen chunks to avoid duplicates
             for doc_embedding, doc_text in zip(results["embeddings"], results["documents"]):
-                similarity = cosine_similarity(query_embedding, doc_embedding)
-                similarities.append({"chunk": doc_text, "score": similarity})
+                if doc_text not in seen_chunks:  # Skip duplicates
+                    similarity = cosine_similarity(query_embedding, doc_embedding)
+                    similarities.append({"chunk": doc_text, "score": similarity})
+                    seen_chunks.add(doc_text)
 
             # Sort by similarity and return top N
             similarities.sort(key=lambda x: x["score"], reverse=True)
@@ -264,4 +238,3 @@ class IntellidocsRAG:
         except Exception as e:
             logger.error(f"Error retrieving results for {pdf_key}: {e}")
             raise RuntimeError(f"Error retrieving results for {pdf_key}: {e}")
-

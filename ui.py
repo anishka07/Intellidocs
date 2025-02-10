@@ -103,7 +103,7 @@ def main():
             if user_query and selected_pdf_key:
                 try:
                     st.subheader(f"Query Results for {selected_pdf_key}: ")
-                    results = rag.retrieve_top_n_custom(user_query, selected_pdf_key, top_n=10)
+                    results = rag.retrieve_top_n_custom(user_query, selected_pdf_key, top_n=5)
                     st.subheader("Response from LLM: ")
                     top_texts = []
                     for item in results:
