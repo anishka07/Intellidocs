@@ -98,7 +98,7 @@ To run IntelliDocs from terminal:
 
 ```bash
 cd examples
-python intellidocs_rag_main.py (make sure to checkt the file)
+python intellidocs_rag_main.py (make sure to check the file)
 ```
 
 To run IntelliDocs from it's streamlit UI:
