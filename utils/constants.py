@@ -5,7 +5,6 @@ class PathSettings:
     PROJECT_DIR_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     PDF_DIR_PATH = os.path.join(PROJECT_DIR_PATH, 'pdfs')
     CHROMA_DB_PATH = os.path.join(PROJECT_DIR_PATH, 'id_chroma_db')
-    UPLOADS_DIR_PATH = os.path.join(PROJECT_DIR_PATH, 'uploads')
     CACHE_DIR_PATH = os.path.join(CHROMA_DB_PATH, 'cache')
 
 

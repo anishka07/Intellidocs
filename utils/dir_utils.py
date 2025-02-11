@@ -15,7 +15,7 @@ def clear_directory(directory):
 
 if __name__ == '__main__':
     try:
-        clear_directory(PathSettings.CSV_DB_DIR_PATH)
-        print("Successfully cleared CSV database directory.")
+        clear_directory(PathSettings.CACHE_DIR_PATH)
+        print("Successfully cleared.")
     except Exception as e:
         print("Exception occurred while cleaning the directory: ", e)
