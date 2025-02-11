@@ -6,19 +6,15 @@ import uuid
 import chromadb
 import fitz
 import spacy
-import numpy as np
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from tqdm.auto import tqdm
 
+from algorithms.cosine_similarity import cosine_similarity
 from utils.constants import ConstantSettings
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
-
-
-def cosine_similarity(a, b):
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
 class IntellidocsRAG:
