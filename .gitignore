@@ -5,3 +5,6 @@ uploads
 id_chroma_db
 pdfs
 .env
+templates
+static
+app.py
