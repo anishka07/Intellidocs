@@ -1,5 +1,6 @@
 import os
 
+from llms.gemini_response import gemini_response
 from model.intellidocs_rag_final.id_rag_updated import IntellidocsRAG
 from utils.constants import PathSettings, ConstantSettings
 
@@ -41,3 +42,6 @@ if __name__ == '__main__':
     )
     for result in top_results:
         print(result)
+
+    # Step 6: Structure the response with a LLM
+    llm_response = gemini_response(top_results)
