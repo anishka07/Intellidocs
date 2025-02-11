@@ -26,6 +26,9 @@
 
 ```plaintext
 ├── README.md
+├── algorithms
+│   ├── __init__.py
+│   └── cosine_similarity.py
 ├── examples
 │   ├── __init__.py
 │   └── intellidocs_rag_main.py
