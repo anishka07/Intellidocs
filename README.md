@@ -11,6 +11,7 @@
 3. **Chunking**: Divide the processed text into manageable chunks to facilitate efficient querying.
 4. **Embedding**: Use Sentence Transformers to generate embeddings for the text chunks, enabling semantic similarity searches.
 5. **Querying**: Develop a retrieval system that allows users to input queries and receive relevant chunks of text based on semantic similarity.
+6. **Structuring**: Structure the generated response with the help of a LLM.
 
 ## Technologies Used
 
@@ -18,75 +19,39 @@
 - **Libraries**:
   - `fitz`: For PDF text extraction.
   - `sentence-transformers`: For embedding text chunks.
-  - `Streamlit`: For creating the user interface (temporary).
+  - `Streamlit`: For creating the user interface.
   - `Chromadb`: For vector database.
-  - `flask`: For backend (w.i.p)
-- **Machine Learning**: Utilizes `pre-trained` embedding model for vector embeddings and uses `chromadb` to store them.
 
 ## Project Structure
 
 ```plaintext
 ├── README.md
-├── app
+├── examples
 │   ├── __init__.py
-│   ├── routes 
-// backend routes 
-│   │   ├── __init__.py
-│   │   ├── auth.py
-│   │   ├── chat.py
-│   │   ├── home.py
-│   │   └── upload.py
-│   ├── static 
-// static files
-│   │   ├── images
-│   │   ├── intellidocsstyle.css
-│   │   └── style.css
-│   ├── templates
- // html templates
-│   │   ├── auth
-│   │   │   ├── login.html
-│   │   │   └── signup.html
-│   │   ├── index.html
-│   │   └── intellidocschat.html
-│   └── utils
- // backend utilities
-│       ├── __init__.py
-│       ├── decorators.py
-│       └── helpers.py
-├── app.py // single file backend logic (might delete later)
-├── config
-│   ├── __init__.py
-│   └── settings.py // backend settings.py
-├── id_chroma_db 
-// cached chunks and embedding example
+│   └── intellidocs_rag_main.py
+├── id_chroma_db
 │   └── cache
-│       ├── 0bed51f0d2edc69a7996e6142e4310d5_chunks.pkl
-│       ├── 0bed51f0d2edc69a7996e6142e4310d5_embeddings.pkl
+          # contains chroma db cache
 ├── images
-│   └── ui.png
+          # ui snippets
+├── llms
+│   ├── __init__.py
+│   ├── gemini_response.py
+│   └── llama_response.py
 ├── model
 │   ├── __init__.py
-│   ├── intellidocs_main.py // Intellidocs main RAG instance
 │   ├── intellidocs_rag_final
-│   │   ├── __init__.py
-│   │   └── id_chroma_rag.py // Intellidocs RAG main w chromadb
-          // contains other versions of intellidocs RAG as well..
-│   └── llms
-│       ├── __init__.py
-│       ├── gemini_response.py // gemini response
-│       └── llama_response.py // llama response
+│   └── tfidf
+│       ├── TF-IDFSummarizer.py
+│       └── __init__.py
 ├── pdfs
-// pdf files for testing..
+          # contains PDFs for input
 ├── requirements.txt
-├── run.py // backend runpoint
-├── ui.py // streamlit application
-├── uploads
-// backend testing
+├── ui.py
 └── utils
-    ├── __init__.py
-    ├── cleanup_chroma.py // clean up chroma db
-    ├── constants.py // project constants
-    └── dir_utils.py // directory utilities 
+    ├── cleanup_chroma.py
+    ├── constants.py
+    └── dir_utils.py
 ```
 
 # Step-by-Step Guide to Clone and Run IntelliDocs
@@ -140,21 +105,23 @@ streamlit run ui.py
 ```
 
 ## Streamlit Interface
+User Interface:
+![User Interface](images/abc.png)
 
-![Intellidocs RAG streamlit landing page](images/1.png)
-![Steps involved in RAG with ui](images/2.png)
-![Generation](images/33.png)
+Indexing multiple PDFs as input:
+![](images/def.png)
 
+Query Response (Both Structured and Relevant Chunks):
+![](images/ghi.png)
 ## Usage
 
-1. **Input PDF**: Upload your PDF document using the Streamlit interface (for now).
-2. **Querying**: Enter your query in the provided query field and submit.
-3. **Results**: The system will return the most relevant text chunks extracted from the PDF based on your query.
+1. **Input PDF**: Upload your PDF/PDFs using the Streamlit interface.
+2. **Querying**: Select the PDF you want to query using the unique generated PDF key and query the PDF.
+3. **Results**: The system will return the most relevant text chunks extracted from the PDF selected.
 
 ## Future Work
 
 - **Expand Support**: Extend support to other document formats (e.g., DOCX, TXT).
 - **Web Application**: Create a full stack web application with apis.
-- **Summarization**: Extracted text summarization using Tf-Idf
 
 
