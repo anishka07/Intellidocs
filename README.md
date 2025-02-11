@@ -109,13 +109,13 @@ streamlit run ui.py
 
 ## Streamlit Interface
 User Interface:
-![User Interface](images/abc.png)
+![User Interface](images/blabla.png)
 
 Indexing multiple PDFs as input:
-![](images/def.png)
+![Indexing multiple PDFs as input](images/def.png)
 
 Query Response (Both Structured and Relevant Chunks):
-![](images/ghi.png)
+![Query Response (Both structured and relevant chunks)](images/blabla2.png)
 ## Usage
 
 1. **Input PDF**: Upload your PDF/PDFs using the Streamlit interface.
