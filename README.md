@@ -94,8 +94,8 @@ pip install -r requirements.txt
 To run IntelliDocs from terminal:
 
 ```bash
-cd model
-python intellidocs_main.py (make sure to checkt the file)
+cd examples
+python intellidocs_rag_main.py (make sure to checkt the file)
 ```
 
 To run IntelliDocs from it's streamlit UI:
