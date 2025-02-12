@@ -7,11 +7,10 @@
 ## Project Objectives
 
 1. **PDF Extraction**: Implement methods to extract text from PDF files, ensuring the preservation of formatting and structure.
-2. **Text Processing**: Clean and tokenize extracted text to prepare it for chunking and embedding.
-3. **Chunking**: Divide the processed text into manageable chunks to facilitate efficient querying.
-4. **Embedding**: Use Sentence Transformers to generate embeddings for the text chunks, enabling semantic similarity searches.
-5. **Querying**: Develop a retrieval system that allows users to input queries and receive relevant chunks of text based on semantic similarity.
-6. **Structuring**: Structure the generated response with the help of a LLM.
+2. **Chunking**: Divide the text into manageable chunks to facilitate efficient querying.
+3. **Embedding**: Use Sentence Transformers to generate embeddings for the text chunks, enabling semantic similarity searches.
+4. **Querying**: Develop a retrieval system that allows users to input queries and receive relevant chunks of text based on semantic similarity.
+5. **Structuring**: Structure the generated response with the help of a LLM.
 
 ## Technologies Used
 
@@ -29,6 +28,7 @@
 ├── algorithms
 │   ├── __init__.py
 │   └── cosine_similarity.py
+│   └── TF-IDFSummarizer.py
 ├── examples
 │   ├── __init__.py
 │   └── intellidocs_rag_main.py
@@ -40,13 +40,11 @@
 ├── llms
 │   ├── __init__.py
 │   ├── gemini_response.py
-│   └── llama_response.py
 ├── model
 │   ├── __init__.py
 │   ├── intellidocs_rag_final
-│   └── tfidf
-│       ├── TF-IDFSummarizer.py
-│       └── __init__.py
+│   │   ├── __init__.py
+│   │   └── intellidocs_main.py
 ├── pdfs
           # contains PDFs for input
 ├── requirements.txt
