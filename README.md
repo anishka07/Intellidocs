@@ -35,7 +35,7 @@
 ├── id_chroma_db
 │   └── cache
           # contains chroma db cache
-├── images
+├── resources
           # ui snippets
 ├── llms
 │   ├── __init__.py
@@ -107,13 +107,13 @@ streamlit run ui.py
 
 ## Streamlit Interface
 User Interface:
-![User Interface](images/blabla.png)
+![User Interface](resources/blabla.png)
 
 Indexing multiple PDFs as input:
-![Indexing multiple PDFs as input](images/def.png)
+![Indexing multiple PDFs as input](resources/def.png)
 
 Query Response (Both Structured and Relevant Chunks):
-![Query Response (Both structured and relevant chunks)](images/blabla2.png)
+![Query Response (Both structured and relevant chunks)](resources/blabla2.png)
 ## Usage
 
 1. **Input PDF**: Upload your PDF/PDFs using the Streamlit interface.
