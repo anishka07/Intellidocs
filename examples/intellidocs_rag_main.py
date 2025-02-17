@@ -15,7 +15,7 @@ pdf_path = os.path.join(PathSettings.PDF_DIR_PATH, 'POM_Unit-1.pdf')
 rag.process(pdf_doc_paths=[pdf_path])
 
 # Extract, chunk, and embed only once per document
-print("🔄 Processing document...")
+print("Processing document...")
 extracted_texts = rag.extract_text_from_documents_fitz()
 chunked_texts = rag.text_chunking(extracted_texts)
 extracted_texts_embeddings = rag.generate_embeddings(
@@ -25,7 +25,7 @@ rag.store_embeddings(
     chunked_texts=chunked_texts,
     embeddings_dict=extracted_texts_embeddings
 )
-print("✅ Document processing completed.")
+print("Document processing completed.")
 
 # Continuous user query loop
 if __name__ == '__main__':
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
         # Exit condition
         if user_query.lower() in ['quit', 'bye', 'exit']:
-            print("👋 Exiting IntelliDocs. Have a great day!")
+            print("Exiting IntelliDocs. Have a great day!")
             break
 
         # Retrieve results using the correct pdf_key
@@ -47,4 +47,4 @@ if __name__ == '__main__':
 
         # Get LLM response
         llm_response = gemini_response(user_query=user_query, context=top_results)
-        print(f"📜 IntelliDocs: {llm_response}")
+        print(f"IntelliDocs: {llm_response}")
