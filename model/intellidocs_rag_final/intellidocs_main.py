@@ -14,7 +14,7 @@ from algorithms.cosine_similarity import cosine_similarity
 from utils.constants import ConstantSettings
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 class IntellidocsRAG:
