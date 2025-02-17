@@ -13,7 +13,7 @@ rag.process(pdf_doc_paths=[
         os.path.join(PathSettings.PDF_DIR_PATH, 'POM_Unit-1.pdf'),
     ],)
 
-user_query = "what is organization goals?"
+user_query = input("Enter query: ")
 
 if __name__ == '__main__':
     # Step 1: Extract text
@@ -44,4 +44,5 @@ if __name__ == '__main__':
         print(result)
 
     # Step 6: Structure the response with a LLM
-    llm_response = gemini_response(top_results)
+    llm_response = gemini_response(user_query=user_query, context=top_results)
+    print(llm_response)
