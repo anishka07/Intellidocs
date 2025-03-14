@@ -1,7 +1,7 @@
 import os
 
 from llms.gemini_response import gemini_response
-from model.intellidocs_rag_final.intellidocs_main import IntellidocsRAG
+from model.intellidocs_rag.intellidocs_main import IntellidocsRAG
 from utils.constants import PathSettings, ConstantSettings
 
 rag = IntellidocsRAG(
