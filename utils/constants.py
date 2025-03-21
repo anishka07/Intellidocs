@@ -17,3 +17,5 @@ class ConstantSettings:
     If the context does not match the query, notify the user with the message.
     """
     SPACY_LOAD: str = "en_core_web_sm"
+    gRPC_PORT: int = 50051
+    

@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from v1 import intellidocs_pb2 as v1_dot_intellidocs__pb2
+from intellidocspb.v1 import intellidocs_pb2 as v1_dot_intellidocs__pb2
 
 GRPC_GENERATED_VERSION = '1.66.0'
 GRPC_VERSION = grpc.__version__
