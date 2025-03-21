@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package intellidocs_proto.v1;
+
+message ChatWithDocumentRequest {
+    string document_id = 1;
+    string user_query = 2;
+}
+
+message ChatWithDocumentResponse {
+    repeated string query_response = 1;
+}
+
+service IntelliDocsService {
+    rpc ChatWithDocument (stream ChatWithDocumentRequest) returns (stream ChatWithDocumentResponse);
+}
