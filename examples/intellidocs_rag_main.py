@@ -10,12 +10,10 @@ rag = IntellidocsRAG(
     chroma_db_dir=PathSettings.CHROMA_DB_PATH
 )
 
-# Pre-process the document (only once)
 pdf_path = os.path.join(PathSettings.PDF_DIR_PATH, 'POM_Unit-1.pdf')
-rag.process(pdf_doc_paths=[pdf_path])
+pdf_path1 = os.path.join(PathSettings.PDF_DIR_PATH, 'monopoly.pdf')
+rag.process(pdf_doc_paths=[pdf_path, pdf_path1])
 
-# Extract, chunk, and embed only once per document
-print("Processing document...")
 extracted_texts = rag.extract_text_from_documents_fitz()
 chunked_texts = rag.text_chunking(extracted_texts)
 extracted_texts_embeddings = rag.generate_embeddings(
@@ -25,26 +23,41 @@ rag.store_embeddings(
     chunked_texts=chunked_texts,
     embeddings_dict=extracted_texts_embeddings
 )
-print("Document processing completed.")
 
-# Continuous user query loop
-if __name__ == '__main__':
-    while True:
-        user_query = input("\nUser: ").strip()
 
-        # Exit condition
-        if user_query.lower() in ['quit', 'bye', 'exit']:
-            print("Exiting IntelliDocs. Have a great day!")
-            break
-
-        # Retrieve results using the correct pdf_key
-        pdf_key = 'POM_Unit-1_key'
-        top_results = rag.retrieve_top_n_custom(
-            user_query=user_query,
-            pdf_key=pdf_key,
+def query_pdf(document_pdf_key: str, query_from_user: str):
+    indexed_keys = list(rag.pdf_keys.values())
+    if document_pdf_key not in indexed_keys:
+        print("PDF key '{}' not found.".format(document_pdf_key))
+        return False
+    else:
+        top_res = rag.retrieve_top_n_custom(
+            user_query=query_from_user,
+            pdf_key=document_pdf_key,
             top_n=5
         )
+        llm_res = gemini_response(
+            user_query=query_from_user,
+            context=top_res,
+        )
+        print("IntelliDocs: ", llm_res)
+        return True
 
-        # Get LLM response
-        llm_response = gemini_response(user_query=user_query, context=top_results)
-        print(f"IntelliDocs: {llm_response}")
+
+if __name__ == '__main__':
+    indexed_keys = list(rag.pdf_keys.values())
+
+    if not indexed_keys:
+        print("No PDF keys found.")
+    else:
+        print("Indexed PDF keys: ", list(rag.pdf_keys.values()))
+        pdf_key = input("Enter PDF key to retrieve: ").strip()
+        if pdf_key not in indexed_keys:
+            print("PDF key '{}' not found.".format(pdf_key))
+        else:
+            while True:
+                user_query = input("\nUser: ").strip()
+                if user_query.lower() in ['quit', 'exit', 'bye']:
+                    print("Exiting...")
+                    break
+                query_pdf(pdf_key, user_query)
