@@ -34,7 +34,7 @@ class IntellidocsRAG:
         extracted_texts_embeddings = self.generate_embeddings(chunked_texts)
         self.store_embeddings(chunked_texts, extracted_texts_embeddings)
 
-    def get_pdf_keys(self):
+    def extract_pdf_keys(self):
         return self.pdf_keys.keys()
 
     def _get_pdf_key(self, pdf_path: str) -> str:
