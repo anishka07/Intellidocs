@@ -18,4 +18,3 @@ class ConstantSettings:
     """
     SPACY_LOAD: str = "en_core_web_sm"
     gRPC_PORT: int = 50051
-    
