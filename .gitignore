@@ -11,3 +11,4 @@ app.py
 model/intellidocs_rag_v1
 model/intellidocs_rag_v2
 model/intellidocs_rag_v3
+grpc_v1
