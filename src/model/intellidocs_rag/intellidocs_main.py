@@ -34,9 +34,6 @@ class IntellidocsRAG:
         extracted_texts_embeddings = self.generate_embeddings(chunked_texts)
         self.store_embeddings(chunked_texts, extracted_texts_embeddings)
 
-    def extract_pdf_keys(self):
-        return self.pdf_keys.keys()
-
     def _get_pdf_key(self, pdf_path: str) -> str:
         """Generate a unique key for each PDF using its filename (without extension)."""
         return os.path.splitext(os.path.basename(pdf_path))[0] + "_key"  # Extract filename without extension
