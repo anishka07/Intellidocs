@@ -2,8 +2,7 @@ import argparse
 
 import grpc
 
-from intellidocspb.v2 import intellidocs_v2_pb2
-from intellidocspb.v2 import intellidocs_v2_pb2_grpc
+from src.intellidocspb.v2 import intellidocs_v2_pb2, intellidocs_v2_pb2_grpc
 
 
 def process_pdfs(stub, pdf_paths):
@@ -23,6 +22,7 @@ def query_document(stub, pdf_key: str, user_query: str, top_n: int):
         )
     )
     print(f"Top {top_n} Results for Query: '{user_query}'")
+    # concatinated_chunks = "\n".join(result.chunk for result in query_response.results)
     for result in query_response.results:
         print(f"Chunk: {result.chunk}")
         print(f"Score: {result.score}")

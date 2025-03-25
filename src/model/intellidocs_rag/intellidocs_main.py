@@ -10,7 +10,7 @@ from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from tqdm.auto import tqdm
 
-from algorithms.cosine_similarity import cosine_similarity
+from src.algorithms.cosine_similarity import cosine_similarity
 from utils.constants import ConstantSettings
 
 logger = logging.getLogger(__name__)

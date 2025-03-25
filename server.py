@@ -1,10 +1,9 @@
 import grpc
 from concurrent import futures
 
-from intellidocspb.v2 import intellidocs_v2_pb2
-from intellidocspb.v2 import intellidocs_v2_pb2_grpc
-
-from model.intellidocs_rag.intellidocs_main import IntellidocsRAG
+from src.intellidocspb.v2 import intellidocs_v2_pb2
+from src.intellidocspb.v2 import intellidocs_v2_pb2_grpc
+from src.model.intellidocs_rag.intellidocs_main import IntellidocsRAG
 from utils.constants import ConstantSettings, PathSettings
 
 
