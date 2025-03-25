@@ -1,0 +1,22 @@
+[project]
+name = "intellidocs"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "chromadb~=0.6.3",
+    "google-generativeai>=0.8.4",
+    "grpcio~=1.66.1",
+    "numpy~=1.26.4",
+    "pandas~=2.2.2",
+    "pymupdf>=1.25.4",
+    "pypdf~=4.3.1",
+    "python-dotenv~=1.0.1",
+    "scikit-learn~=1.5.1",
+    "sentence-transformers~=3.1.0",
+    "spacy>=3.8.4",
+    "streamlit~=1.37.1",
+    "torch~=2.5.1",
+    "tqdm~=4.66.5",
+]

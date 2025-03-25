@@ -19,17 +19,17 @@ class IntellidocsService(intellidocs_v2_pb2_grpc.IntellidocsServiceServicer):
     def ProcessPDFs(self, request, context):
         pdf_paths = request.pdf_paths
         self.rag.process(pdf_paths)
-        pdf_keys = {pdf_path: self.rag._get_pdf_key(pdf_path) for pdf_path in pdf_paths}
+        pdf_keys = {pdf_path: self.rag._generate_document_key(pdf_path) for pdf_path in pdf_paths}
         return intellidocs_v2_pb2.ProcessPDFsResponse(pdf_keys=pdf_keys)
 
     def QueryDocument(self, request, context):
         pdf_key = request.pdf_key
         user_query = request.user_query
         top_n = request.top_n
-        results = self.rag.retrieve_top_n_custom(
+        results = self.rag.retrieve_top_n(
+            doc_key=pdf_key,
             user_query=user_query,
             top_n=top_n,
-            pdf_key=pdf_key,
         )
         response = intellidocs_v2_pb2.QueryDocumentResponse()
         for result in results:

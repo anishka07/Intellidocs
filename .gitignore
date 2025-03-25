@@ -177,3 +177,4 @@ grpc_v1
 id_chroma_db
 pdfs
 chromadb
+.DS_Store
