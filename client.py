@@ -30,7 +30,7 @@ def query_document(stub, pdf_key: str, user_query: str, top_n: int):
 
 
 def run():
-    parser = argparse.ArgumentParser(description="InterDocs gRPC Client")
+    parser = argparse.ArgumentParser(description="IntelliDocs gRPC Client")
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     process_parser = subparsers.add_parser("process", help="Process PDFs")
