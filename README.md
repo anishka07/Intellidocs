@@ -21,47 +21,13 @@
   - `Streamlit`: For creating the user interface.
   - `Chromadb`: For vector database.
 
-## Project Structure
-
-```plaintext
-├── README.md
-├── algorithms
-│   ├── __init__.py
-│   └── cosine_similarity.py
-│   └── TF-IDFSummarizer.py
-├── examples
-│   ├── __init__.py
-│   └── intellidocs_rag_main.py
-├── id_chroma_db
-│   └── cache
-          # contains chroma db cache
-├── resources
-          # ui snippets
-├── llms
-│   ├── __init__.py
-│   ├── gemini_response.py
-├── model
-│   ├── __init__.py
-│   ├── intellidocs_rag_final
-│   │   ├── __init__.py
-│   │   └── intellidocs_main.py
-├── pdfs
-          # contains PDFs for input
-├── requirements.txt
-├── ui.py
-└── utils
-    ├── cleanup_chroma.py
-    ├── constants.py
-    └── dir_utils.py
-```
-
 # Step-by-Step Guide to Clone and Run IntelliDocs
 
 ## Prerequisites
 
 Ensure you have the following installed on your system:
-- Python (version 3.7 or higher)
-- pip (Python package installer)
+- Python (version 3.12)
+- uv (Python package installer)
 - Git
 
 ## Step 1: Clone the Repository
@@ -72,57 +38,47 @@ Open your terminal or command prompt and run the following command:
 git clone https://github.com/anishka07/intellidocs.git
 ```
 
-## Step 2: Create a virtual environment using conda or virtual env and activate it
+## Step 2: Create a runnable environment automatically with uv
 
 Run the following command:
 
 ```bash
-## Example:
-conda create -n your_env_name python=3.11 pip -y
-conda activate your_env_name 
+uv sync 
 ```
 
-## Step 3: Install Requirements
+## Step 3: Run IntelliDocs using gRPC or streamlit
 
-Run the following command:
+Run IntelliDocs gRPC server and client:
 
 ```bash
-pip install -r requirements.txt
+uv run python server.py 
 ```
 
-## Step 4: Run IntelliDocs from terminal or streamlit
-
-To run IntelliDocs from terminal:
-
 ```bash
-cd examples
-python intellidocs_rag_main.py (make sure to check the file)
+uv run python client.py process *your pdf's name*
+
+uv run python client.py query *your pdf key* *your query*
 ```
 
 To run IntelliDocs from it's streamlit UI:
 
 ```bash
-streamlit run ui.py
+uv run streamlit run ui.py
 ```
 
 ## Streamlit Interface
 User Interface:
-![User Interface](resources/blabla.png)
+![User Interface](resources/user_interface.png)
 
 Indexing multiple PDFs as input:
-![Indexing multiple PDFs as input](resources/def.png)
+![Indexing multiple PDFs as input](resources/index.png)
 
 Query Response (Both Structured and Relevant Chunks):
-![Query Response (Both structured and relevant chunks)](resources/blabla2.png)
+![Query Response (Both structured and relevant chunks)](resources/query_res.png)
 ## Usage
 
 1. **Input PDF**: Upload your PDF/PDFs using the Streamlit interface.
 2. **Querying**: Select the PDF you want to query using the unique generated PDF key and query the PDF.
 3. **Results**: The system will return the most relevant text chunks extracted from the PDF selected.
-
-## Future Work
-
-- **Expand Support**: Extend support to other document formats (e.g., DOCX, TXT).
-- **Web Application**: Create a full stack web application with apis.
 
 
