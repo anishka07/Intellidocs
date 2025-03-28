@@ -1,11 +1,24 @@
-from pymilvus import connections, Collection, FieldSchema, CollectionSchema, DataType, utility
+from pymilvus import (
+    connections,
+    Collection,
+    FieldSchema,
+    CollectionSchema,
+    DataType,
+    utility,
+)
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
 
 class EmbeddingProcessorV1:
-
-    def __init__(self, embedding_model_name: str, pages_and_chunks: list[dict], project_dir: str, collection_name: str, connection_alias: str):
+    def __init__(
+        self,
+        embedding_model_name: str,
+        pages_and_chunks: list[dict],
+        project_dir: str,
+        collection_name: str,
+        connection_alias: str,
+    ):
         self.embedding_model_name = embedding_model_name
         self.embedding_model = SentenceTransformer(self.embedding_model_name)
         self.embedding_model.tokenizer.clean_up_tokenization_spaces = True
@@ -29,17 +42,23 @@ class EmbeddingProcessorV1:
         fields = [
             FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
             FieldSchema(name="page_number", dtype=DataType.INT64),
-            FieldSchema(name="sentence_chunk", dtype=DataType.VARCHAR, max_length=65535),
-            FieldSchema(name="embeddings", dtype=DataType.FLOAT_VECTOR, dim=768)  # Adjust dimension as needed
+            FieldSchema(
+                name="sentence_chunk", dtype=DataType.VARCHAR, max_length=65535
+            ),
+            FieldSchema(
+                name="embeddings", dtype=DataType.FLOAT_VECTOR, dim=768
+            ),  # Adjust dimension as needed
         ]
         schema = CollectionSchema(fields, "PDF Chunks Collection")
-        collection = Collection(self.collection_name, schema, using=self.connection_alias)
+        collection = Collection(
+            self.collection_name, schema, using=self.connection_alias
+        )
 
         # Create an IVF_FLAT index for the embeddings field
         index_params = {
             "metric_type": "L2",
             "index_type": "IVF_FLAT",
-            "params": {"nlist": 1024}
+            "params": {"nlist": 1024},
         }
         collection.create_index("embeddings", index_params)
         return collection
@@ -49,19 +68,29 @@ class EmbeddingProcessorV1:
         entities = []
         for item in tqdm(self.pages_and_chunks):
             embedding = self.encode_chunk(item["sentence_chunk"])
-            entities.append([
-                item["page_number"],
-                item["sentence_chunk"],
-                embedding.tolist()
-            ])
+            entities.append(
+                [item["page_number"], item["sentence_chunk"], embedding.tolist()]
+            )
 
         collection.insert(entities)
         collection.flush()
         return self.collection_name
 
 
-def embedding_process_main(embedding_model_name: str, pages_and_chunks: list[dict], project_dir: str,
-                           collection_name: str, dev: str, connection_alias: str):
-    ep = EmbeddingProcessorV1(embedding_model_name, pages_and_chunks, project_dir, collection_name, connection_alias)
+def embedding_process_main(
+    embedding_model_name: str,
+    pages_and_chunks: list[dict],
+    project_dir: str,
+    collection_name: str,
+    dev: str,
+    connection_alias: str,
+):
+    ep = EmbeddingProcessorV1(
+        embedding_model_name,
+        pages_and_chunks,
+        project_dir,
+        collection_name,
+        connection_alias,
+    )
     ep.move_model_to_device(device=dev)
     return ep.add_embeddings_to_chunks()

@@ -9,10 +9,7 @@ class MilvusConnectionManager:
     def __init__(self, host: str = "localhost", port: str = "19530"):
         self.host = host
         self.port = port
-        self.connection_params = {
-            "host": self.host,
-            "port": self.port
-        }
+        self.connection_params = {"host": self.host, "port": self.port}
 
     def _connect(self, alias: str) -> None:
         """Establish connection with proper error handling"""

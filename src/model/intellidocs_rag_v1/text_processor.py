@@ -7,7 +7,6 @@ from utils.constants import PathSettings
 
 
 class TextProcessor:
-
     def __init__(self, text: str, slice_size: int):
         self.slice_size = slice_size
         self.text = text
@@ -29,11 +28,16 @@ class TextProcessor:
             list[list[str]]: A list of chunks, each containing a slice of the sentences.
         """
         sentences = self.sentence_tokenizer()
-        return [sentences[i:i + self.slice_size] for i in range(0, len(sentences), self.slice_size)]
+        return [
+            sentences[i : i + self.slice_size]
+            for i in range(0, len(sentences), self.slice_size)
+        ]
 
 
-if __name__ == '__main__':
-    pdf_processor = PDFProcessor(pdf_name='monopoly.pdf', pdf_path=PathSettings.PDF_FILE_PATH)
+if __name__ == "__main__":
+    pdf_processor = PDFProcessor(
+        pdf_name="monopoly.pdf", pdf_path=PathSettings.PDF_FILE_PATH
+    )
     extracted_text = pdf_processor.extract_text()
     cleaned_text = pdf_processor.clean_text()
 

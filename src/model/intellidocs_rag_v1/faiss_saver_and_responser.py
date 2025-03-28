@@ -18,7 +18,6 @@ genai.configure(api_key=GA_API_KEY)
 
 
 class VectorStore:
-
     def __init__(self, model_name: str = ConstantSettings.EMBEDDING_MODEL_NAME):
         """
         Initializes the VectorStore class to embed and store text chunks in FAISS.
@@ -31,7 +30,7 @@ class VectorStore:
         self.text_chunks = []
 
         # Initialize Gemini model
-        self.gemini_model = genai.GenerativeModel('gemini-pro')
+        self.gemini_model = genai.GenerativeModel("gemini-pro")
 
     def embed_text_chunks(self, text_chunks: List[List[str]]) -> np.ndarray:
         """
@@ -44,7 +43,7 @@ class VectorStore:
             np.ndarray: An array of embedded vectors.
         """
         self.text_chunks = text_chunks
-        concatenated_chunks = [' '.join(chunk) for chunk in text_chunks]
+        concatenated_chunks = [" ".join(chunk) for chunk in text_chunks]
         embeddings = self.model.encode(concatenated_chunks)
         return np.array(embeddings)
 
@@ -65,7 +64,9 @@ class VectorStore:
             embeddings (np.ndarray): Embedding vectors to add to the index.
         """
         if self.index is None:
-            raise ValueError("FAISS index is not created. Call create_faiss_index first.")
+            raise ValueError(
+                "FAISS index is not created. Call create_faiss_index first."
+            )
         self.index.add(embeddings)
 
     def search(self, query_text: str, top_k: int = 5):
@@ -93,7 +94,7 @@ class VectorStore:
         return response.text
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pdf_processor = PDFProcessor("nlp.pdf", PathSettings.PDF_DIR_PATH)
     extracted_text = pdf_processor.extract_text()
     cleaned_text = pdf_processor.clean_text()
@@ -113,4 +114,4 @@ if __name__ == '__main__':
     query_text = "what does this book say about Data collection and labeling?"
     gemini_response = vector_store.search(query_text, top_k=5)
 
-    print('Gemini response:', gemini_response)
+    print("Gemini response:", gemini_response)

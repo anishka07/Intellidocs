@@ -16,13 +16,14 @@ logger = logging.getLogger(__name__)
 rag = IntellidocsRAG(
     chunk_size=ConstantSettings.CHUNK_SIZE,
     embedding_model=ConstantSettings.EMBEDDING_MODEL_NAME,
-    chroma_db_dir=PathSettings.CHROMA_DB_PATH)
+    chroma_db_dir=PathSettings.CHROMA_DB_PATH,
+)
 
 
 def load_pdf_as_base64(file_path):
     """Convert PDF file to base64 string."""
     with open(file_path, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+        base64_pdf = base64.b64encode(f.read()).decode("utf-8")
     return base64_pdf
 
 
@@ -34,9 +35,7 @@ def main():
 
     # File uploader for PDFs
     uploaded_pdfs = st.sidebar.file_uploader(
-        "Upload PDFs for analysis",
-        type=["pdf"],
-        accept_multiple_files=True
+        "Upload PDFs for analysis", type=["pdf"], accept_multiple_files=True
     )
 
     if uploaded_pdfs:
@@ -84,37 +83,35 @@ def main():
         selected_pdf_key = st.sidebar.selectbox(
             "Select PDF for Querying",
             pdf_keys,
-            format_func=lambda x: x.replace("_key", ".pdf")
+            format_func=lambda x: x.replace("_key", ".pdf"),
         )
 
         # Main query interface
-        st.markdown("<h2 style='text-align: center;'>Query Your Document</h2>", unsafe_allow_html=True)
+        st.markdown(
+            "<h2 style='text-align: center;'>Query Your Document</h2>",
+            unsafe_allow_html=True,
+        )
 
         # Center the query input
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             user_query = st.text_input(
-                "Enter your query:",
-                key="query_input",
-                help="Type your question here."
+                "Enter your query:", key="query_input", help="Type your question here."
             )
 
             # Process query and display results
             if user_query and selected_pdf_key:
                 try:
                     st.subheader(f"Query Results for {selected_pdf_key}: ")
-                    results = rag.retrieve_top_n_custom(user_query, selected_pdf_key, top_n=5)
+                    results = rag.retrieve_top_n(
+                        user_query, selected_pdf_key, top_n=5
+                    )
                     st.subheader("Response from LLM: ")
                     top_texts = []
                     for item in results:
-                        chunk = item['chunk'].strip()
-                        score = item['score']
-                        top_texts.append(
-                            {
-                                'text': chunk,
-                                'score': score
-                            }
-                        )
+                        chunk = item["chunk"].strip()
+                        score = item["score"]
+                        top_texts.append({"text": chunk, "score": score})
                     llm_response = gemini_response(
                         user_query=user_query,
                         context=top_texts,
@@ -126,13 +123,15 @@ def main():
                         st.subheader("Retrieved Chunks (ordered by relevance): ")
                         st.write("-" * 80)
                         for i, item in enumerate(top_texts, 1):
-                            st.write(f"\nChunk {i} (Similarity Score: {item['score']:.4f})")
-                            st.write(item['text'])
+                            st.write(
+                                f"\nChunk {i} (Similarity Score: {item['score']:.4f})"
+                            )
+                            st.write(item["text"])
                             st.write("-" * 80)
 
                 except Exception as e:
                     st.error(f"Error retrieving results: {str(e)}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

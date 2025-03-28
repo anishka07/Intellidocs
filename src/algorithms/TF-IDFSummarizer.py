@@ -3,7 +3,6 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 
 
 class TfIdfSummarizer:
-
     def __init__(self, document: str):
         self.document = document
         self.sentences = sent_tokenize(self.document)
@@ -26,8 +25,12 @@ class TfIdfSummarizer:
         idf_dict = {}
         total_sentences = len(self.sentences)
         for word in self.word_set:
-            sentence_count_containing_word = sum(1 for sentence in self.words if word in sentence)
-            idf_dict[word] = math.log(total_sentences / (1 + sentence_count_containing_word))
+            sentence_count_containing_word = sum(
+                1 for sentence in self.words if word in sentence
+            )
+            idf_dict[word] = math.log(
+                total_sentences / (1 + sentence_count_containing_word)
+            )
         return idf_dict
 
     def compute_tfidf(self) -> list[dict]:
@@ -50,6 +53,8 @@ class TfIdfSummarizer:
 
     def summarize(self, num_sentences: int) -> str:
         ranked_sentences = self.rank_sentences()
-        selected_sentences_idx = sorted([idx for idx, score in ranked_sentences[:num_sentences]])
-        text_summary = ' '.join(self.sentences[idx] for idx in selected_sentences_idx)
+        selected_sentences_idx = sorted(
+            [idx for idx, score in ranked_sentences[:num_sentences]]
+        )
+        text_summary = " ".join(self.sentences[idx] for idx in selected_sentences_idx)
         return text_summary

@@ -7,11 +7,11 @@ from utils.constants import PathSettings, ConstantSettings
 rag = IntellidocsRAG(
     chunk_size=ConstantSettings.CHUNK_SIZE,
     embedding_model=ConstantSettings.EMBEDDING_MODEL_NAME,
-    chroma_db_dir=PathSettings.CHROMA_DB_PATH
+    chroma_db_dir=PathSettings.CHROMA_DB_PATH,
 )
 
-pdf_path = os.path.join(PathSettings.PDF_DIR_PATH, 'POM_Unit-1.pdf')
-pdf_path1 = os.path.join(PathSettings.PDF_DIR_PATH, 'monopoly.pdf')
+pdf_path = os.path.join(PathSettings.PDF_DIR_PATH, "POM_Unit-1.pdf")
+pdf_path1 = os.path.join(PathSettings.PDF_DIR_PATH, "monopoly.pdf")
 rag.process(pdf_doc_paths=[pdf_path, pdf_path1])
 
 extracted_texts = rag.extract_text(document_paths=[pdf_path, pdf_path1])
@@ -20,8 +20,7 @@ extracted_texts_embeddings = rag.generate_embeddings(
     chunked_texts=chunked_texts, batch_size=16
 )
 rag.store_embeddings(
-    chunked_texts=chunked_texts,
-    embeddings_dict=extracted_texts_embeddings
+    chunked_texts=chunked_texts, embeddings_dict=extracted_texts_embeddings
 )
 
 
@@ -32,9 +31,7 @@ def query_pdf(document_pdf_key: str, query_from_user: str):
         return False
     else:
         top_res = rag.retrieve_top_n(
-            user_query=query_from_user,
-            doc_key=document_pdf_key,
-            top_n=5
+            user_query=query_from_user, doc_key=document_pdf_key, top_n=5
         )
         llm_res = gemini_response(
             user_query=query_from_user,
@@ -44,7 +41,7 @@ def query_pdf(document_pdf_key: str, query_from_user: str):
         return True
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     indexed_keys = list(rag.document_keys.values())
 
     if not indexed_keys:
@@ -57,7 +54,7 @@ if __name__ == '__main__':
         else:
             while True:
                 user_query = input("\nUser: ").strip()
-                if user_query.lower() in ['quit', 'exit', 'bye']:
+                if user_query.lower() in ["quit", "exit", "bye"]:
                     print("Exiting...")
                     break
                 query_pdf(pdf_key, user_query)

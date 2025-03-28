@@ -12,26 +12,22 @@ from tqdm.auto import tqdm
 
 
 class BaseIntelliDocs(ABC):
-
     def __init__(
-            self,
-            chunk_size: int,
-            embedding_model: str,
-            chroma_db_dir: str,
-            cache_dir: Optional[str] = None
+        self,
+        chunk_size: int,
+        embedding_model: str,
+        chroma_db_dir: str,
+        cache_dir: Optional[str] = None,
     ) -> None:
         self.logger = logging.getLogger(self.__class__.__name__)
         logging.basicConfig(
             level=logging.INFO,
-            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         )
         self.chunk_size = chunk_size
         self.embedding_model = SentenceTransformer(embedding_model)
         self.chroma_client = chromadb.Client(
-            Settings(
-                persist_directory=chroma_db_dir,
-                anonymized_telemetry=False
-            )
+            Settings(persist_directory=chroma_db_dir, anonymized_telemetry=False)
         )
         self.cache_dir = cache_dir or os.path.join(chroma_db_dir, "cache")
         os.makedirs(self.cache_dir, exist_ok=True)
@@ -69,9 +65,9 @@ class BaseIntelliDocs(ABC):
         pass
 
     def generate_embeddings(
-            self,
-            chunked_texts: Dict[str, List[str]],
-            batch_size: int = 16,
+        self,
+        chunked_texts: Dict[str, List[str]],
+        batch_size: int = 16,
     ) -> Dict[str, List[List[float]]]:
         embeddings_dict = {}
         for doc_key, text_chunks in chunked_texts.items():
@@ -83,8 +79,11 @@ class BaseIntelliDocs(ABC):
                 continue
             self.logger.info(f"Generating embedding for {doc_key}")
             embeddings = []
-            for i in tqdm(range(0, len(text_chunks), batch_size), desc=f"Generating embeddings for {doc_key}"):
-                batch = text_chunks[i:i + batch_size]
+            for i in tqdm(
+                range(0, len(text_chunks), batch_size),
+                desc=f"Generating embeddings for {doc_key}",
+            ):
+                batch = text_chunks[i : i + batch_size]
                 batch_embeddings = self.embedding_model.encode(batch)
                 embeddings.extend(batch_embeddings.tolist())
 
@@ -93,21 +92,19 @@ class BaseIntelliDocs(ABC):
         return embeddings_dict
 
     def store_embeddings(
-            self,
-            chunked_texts: Dict[str, List[str]],
-            embeddings_dict: Dict[str, List[List[float]]]
-        ) -> None:
+        self,
+        chunked_texts: Dict[str, List[str]],
+        embeddings_dict: Dict[str, List[List[float]]],
+    ) -> None:
         self.logger.info("Storing embeddings")
         for doc_key, text_chunks in chunked_texts.items():
             collection_name = f"pdf_{doc_key}"
             collection = self.chroma_client.get_or_create_collection(
                 name=collection_name,
                 metadata={"hnsw:space": "cosine"},
-                embedding_function=None
+                embedding_function=None,
             )
-            existing_documents = collection.get(
-                include=["documents"]
-            )["documents"]
+            existing_documents = collection.get(include=["documents"])["documents"]
             unique_chunks = []
             unique_embeddings = []
             for chunk, embedding in zip(text_chunks, embeddings_dict[doc_key]):
@@ -120,16 +117,15 @@ class BaseIntelliDocs(ABC):
                     embeddings=unique_embeddings,
                     ids=[str(uuid.uuid4()) for _ in unique_chunks],
                 )
-                self.logger.info(f"Stored {len(unique_chunks)} new embeddings for {doc_key}")
+                self.logger.info(
+                    f"Stored {len(unique_chunks)} new embeddings for {doc_key}"
+                )
             else:
                 self.logger.info(f"No new chunks to store for {doc_key}")
 
     @abstractmethod
     def retrieve_top_n(
-            self,
-            user_query: str,
-            doc_key: str,
-            top_n: int = 5
+        self, user_query: str, doc_key: str, top_n: int = 5
     ) -> List[Dict[str, float]]:
         pass
 

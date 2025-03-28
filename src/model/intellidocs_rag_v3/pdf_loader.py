@@ -29,8 +29,9 @@ def download_and_save_pdf(pdf_url: str, saved_pdf_name: str):
 
 
 class PdfLoader:
-
-    def __init__(self, pdf_path: str, pdf_url: str = None, save_pdf_name: str = None) -> None:
+    def __init__(
+        self, pdf_path: str, pdf_url: str = None, save_pdf_name: str = None
+    ) -> None:
         self.pdf_path = pdf_path
         self.pdf_url = pdf_url
         if self.pdf_url is not None and self.pdf_path is None:
@@ -50,25 +51,32 @@ class PdfLoader:
         for page_number, page in tqdm(enumerate(docs)):
             text = page.get_text()
             text = text.replace("\n", "").strip()
-            page_and_text.append({"page_number": page_number,  # - 41 for the health pdf
-                                  "page_char_count": len(text),
-                                  "page_word_count": len(text.split(" ")),
-                                  "page_sentence_count_raw": len(text.split(". ")),
-                                  "page_token_count": len(text) / 4,
-                                  "text": text})
+            page_and_text.append(
+                {
+                    "page_number": page_number,  # - 41 for the health pdf
+                    "page_char_count": len(text),
+                    "page_word_count": len(text.split(" ")),
+                    "page_sentence_count_raw": len(text.split(". ")),
+                    "page_token_count": len(text) / 4,
+                    "text": text,
+                }
+            )
         return page_and_text
 
     def add_tokenized_sentences(self):
         num_chunks = 10
 
         def split_list(input_list: list, slice_size: int):
-            return [input_list[i:i + slice_size] for i in range(0, len(input_list), slice_size)]
+            return [
+                input_list[i : i + slice_size]
+                for i in range(0, len(input_list), slice_size)
+            ]
 
         pages_and_texts_dict = self.fitz_open_and_load_pdf()
         nlp = English()
-        nlp.add_pipe('sentencizer')
+        nlp.add_pipe("sentencizer")
         for item in tqdm(pages_and_texts_dict):
-            item["sentences"] = list(nlp(item['text']).sents)
+            item["sentences"] = list(nlp(item["text"]).sents)
             item["sentences"] = [str(sentence) for sentence in item["sentences"]]
             item["page_sentence_count_spacy"] = len(item["sentences"])
             item["sentence_chunks"] = split_list(item["sentences"], num_chunks)
@@ -82,6 +90,6 @@ def pdf_loader_main(path: str, pdf_name: str):
     return extracted_dict
 
 
-if __name__ == '__main__':
-    pages_and_texts = pdf_loader_main(path=id_rag_pdf_path, pdf_name='frog.pdf')
+if __name__ == "__main__":
+    pages_and_texts = pdf_loader_main(path=id_rag_pdf_path, pdf_name="frog.pdf")
     print(pages_and_texts[0:5])

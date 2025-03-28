@@ -14,7 +14,6 @@ from utils.constants import PathSettings
 
 
 class PdfTextLoader:
-
     def __init__(self, pdf_name: str, pdf_path: str) -> None:
         self.pdf_name = pdf_name
         self.pdf_path = pdf_path
@@ -26,7 +25,9 @@ class PdfTextLoader:
 
     def pdf_text_extractor(self) -> str:
         all_text = ""
-        for page_number, page in tqdm(enumerate(doc), total=len(doc), desc="Extracting PDF"):
+        for page_number, page in tqdm(
+            enumerate(doc), total=len(doc), desc="Extracting PDF"
+        ):
             text = page.get_text("text")
             all_text += text
 
@@ -49,7 +50,7 @@ class PdfTextLoader:
         def split_into_sentences(pdf_text: str = extracted_text) -> list[str]:
             # Split the text into sentences
             pdf_text = pdf_text.replace("\n", " ")
-            return re.split(r'(?<=[.!?])\s+', pdf_text)
+            return re.split(r"(?<=[.!?])\s+", pdf_text)
 
         def get_overlap_words(pdf_text: str = extracted_text) -> list[str]:
             # Get the last `chunk_overlap` words from a chunk
@@ -70,7 +71,9 @@ class PdfTextLoader:
                 if current_chunk:
                     text_chunks.append(" ".join(current_chunk))
                     overlap_words = get_overlap_words(" ".join(current_chunk))
-                    current_chunk = overlap_words  # Start a new chunk with the overlap words
+                    current_chunk = (
+                        overlap_words  # Start a new chunk with the overlap words
+                    )
                     current_chunk_size = len(" ".join(overlap_words))
 
             # Add the sentence to the current chunk
@@ -85,14 +88,15 @@ class PdfTextLoader:
 
 
 class TextEmbedding:
-
     def __init__(self, vector_size: int, min_count: int, epochs: int):
         self.vector_size = vector_size
         self.min_count = min_count
         self.epochs = epochs
         self.model = None
 
-    def train_doc2vec(self, text_chunks: list[str], save_model: bool, model_name: str) -> None:
+    def train_doc2vec(
+        self, text_chunks: list[str], save_model: bool, model_name: str
+    ) -> None:
         """
         Trains a Doc2Vec model on the provided text chunks.
         Args:
@@ -104,14 +108,21 @@ class TextEmbedding:
 
         """
         # Prepare the training data by tagging each document (chunk)
-        tagged_data = [TaggedDocument(words=chunk.split(), tags=[str(i)]) for i, chunk in enumerate(text_chunks)]
+        tagged_data = [
+            TaggedDocument(words=chunk.split(), tags=[str(i)])
+            for i, chunk in enumerate(text_chunks)
+        ]
 
         # Initialize the Doc2Vec model
-        self.model = Doc2Vec(vector_size=self.vector_size, min_count=self.min_count, epochs=self.epochs)
+        self.model = Doc2Vec(
+            vector_size=self.vector_size, min_count=self.min_count, epochs=self.epochs
+        )
 
         # Build the vocabulary and train the model
         self.model.build_vocab(tagged_data)
-        self.model.train(tagged_data, total_examples=self.model.corpus_count, epochs=self.epochs)
+        self.model.train(
+            tagged_data, total_examples=self.model.corpus_count, epochs=self.epochs
+        )
 
         if save_model:
             if not model_name.endswith(".pkl"):
@@ -125,8 +136,12 @@ class TextEmbedding:
 
     def embed_text(self, text_chunks: list[str]) -> list[list[float]]:
         if not self.model:
-            raise ValueError("Model must be trained before embedding. Call train_doc2vec() first.")
-        text_embeddings = [self.model.infer_vector(chunk.split()) for chunk in text_chunks]
+            raise ValueError(
+                "Model must be trained before embedding. Call train_doc2vec() first."
+            )
+        text_embeddings = [
+            self.model.infer_vector(chunk.split()) for chunk in text_chunks
+        ]
         return text_embeddings
 
 
@@ -135,13 +150,13 @@ def save_embeddings_to_csv(text_chunks, text_embeddings, csv_file_name: str):
         csv_file_name += ".csv"
     csv_save_path = os.path.join(PathSettings.CSV_DB_DIR_PATH, csv_file_name)
     if not os.path.exists(csv_save_path):
-        with open(csv_save_path, mode='w', newline='') as file:
+        with open(csv_save_path, mode="w", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(["Chunk_Index", "Text", "Embedding"])  # Header
 
             for idx, (chunk, embedding) in enumerate(zip(text_chunks, text_embeddings)):
                 # Convert the embedding list to a string for storing in CSV
-                embedding_str = ','.join(map(str, embedding))
+                embedding_str = ",".join(map(str, embedding))
                 writer.writerow([f"Chunk_{idx + 1}", chunk, embedding_str])
         print("Csv file saved successfully at: ", csv_save_path)
     else:
@@ -155,19 +170,21 @@ def load_embeddings_from_csv(csv_file_name: str):
     text_chunks = []
     text_embeddings = []
     if os.path.exists(csv_save_path):
-        with open(csv_save_path, mode='r') as file:
+        with open(csv_save_path, mode="r") as file:
             reader = csv.reader(file)
             next(reader)  # Skips the header
             for row in reader:
                 chunked_text = row[1]
-                embedding = np.array(list(map(float, row[2].split(','))))
+                embedding = np.array(list(map(float, row[2].split(","))))
                 text_chunks.append(chunked_text)
                 text_embeddings.append(embedding)
 
         return text_chunks, np.array(text_embeddings)
 
 
-def find_most_similar_chunk(query_text, doc2vec_model, text_embeddings, text_chunks, top_n=1):
+def find_most_similar_chunk(
+    query_text, doc2vec_model, text_embeddings, text_chunks, top_n=1
+):
     # Embed the query
     query_embedding = doc2vec_model.infer_vector(query_text.split())
 
@@ -180,21 +197,31 @@ def find_most_similar_chunk(query_text, doc2vec_model, text_embeddings, text_chu
     return [(text_chunks[idx], similarities[idx]) for idx in top_n_indices]
 
 
-if __name__ == '__main__':
-    pdf_text_loader = PdfTextLoader(pdf_name='health.pdf', pdf_path=PathSettings.PDF_DIR_PATH)
+if __name__ == "__main__":
+    pdf_text_loader = PdfTextLoader(
+        pdf_name="health.pdf", pdf_path=PathSettings.PDF_DIR_PATH
+    )
     chunks = pdf_text_loader.chunk_text(chunk_size=1000, chunk_overlap=20)
 
     text_embedder = TextEmbedding(vector_size=100, min_count=2, epochs=100)
-    text_embedder.train_doc2vec(text_chunks=chunks, save_model=False, model_name='embeddings_v4')
+    text_embedder.train_doc2vec(
+        text_chunks=chunks, save_model=False, model_name="embeddings_v4"
+    )
     embeddings = text_embedder.embed_text(text_chunks=chunks)
 
-    save_embeddings_to_csv(text_chunks=chunks, text_embeddings=embeddings, csv_file_name='chunks_and_embeddings_v4')
+    save_embeddings_to_csv(
+        text_chunks=chunks,
+        text_embeddings=embeddings,
+        csv_file_name="chunks_and_embeddings_v4",
+    )
 
-    chunks, embeddings = load_embeddings_from_csv('chunks_and_embeddings_v4')
+    chunks, embeddings = load_embeddings_from_csv("chunks_and_embeddings_v4")
 
     # Simulate a user query
     query = "symptoms of pellagra"
-    similar_chunks = find_most_similar_chunk(query, text_embedder.model, embeddings, chunks, top_n=3)
+    similar_chunks = find_most_similar_chunk(
+        query, text_embedder.model, embeddings, chunks, top_n=3
+    )
 
     for chunk, similarity in similar_chunks:
         print(f"Chunk: {chunk}")

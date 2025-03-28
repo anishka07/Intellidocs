@@ -7,7 +7,7 @@ from utils.constants import ConstantSettings
 
 load_dotenv()
 
-api_key = os.getenv('GOOGLE_GEMINI_API')
+api_key = os.getenv("GOOGLE_GEMINI_API")
 
 
 def gemini_response(user_query: str, context: str) -> str:
@@ -18,6 +18,6 @@ def gemini_response(user_query: str, context: str) -> str:
     return r.text
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     text = gemini_response(user_query="what is statistical learning?", context="")
     print(text)

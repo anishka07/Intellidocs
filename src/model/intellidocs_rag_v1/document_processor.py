@@ -46,7 +46,9 @@ class PDFProcessor:
         return self.text
 
 
-if __name__ == '__main__':
-    pdf_processor = PDFProcessor(pdf_name='monopoly.pdf', pdf_path=PathSettings.PDF_FILE_PATH)
+if __name__ == "__main__":
+    pdf_processor = PDFProcessor(
+        pdf_name="monopoly.pdf", pdf_path=PathSettings.PDF_FILE_PATH
+    )
     print(pdf_processor.extract_text())
     print(pdf_processor.clean_text())

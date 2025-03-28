@@ -13,7 +13,7 @@ def clear_directory(directory):
             shutil.rmtree(file_path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         clear_directory(PathSettings.CACHE_DIR_PATH)
         print("Successfully cleared.")
