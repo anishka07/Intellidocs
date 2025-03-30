@@ -5,8 +5,8 @@ import tempfile
 
 import streamlit as st
 
-from src.llms.gemini_response import gemini_response
 from src.model.intellidocs_rag.intellidocs_main import IntellidocsRAG
+from src.llms.gemini_response import gemini_response
 from utils.constants import ConstantSettings, PathSettings
 
 logging.basicConfig(level=logging.INFO)
