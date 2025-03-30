@@ -1,7 +1,7 @@
 [project]
 name = "intellidocs"
 version = "0.1.0"
-description = "Add your description here"
+description = "Intellidocs is an AI powered web application made on streamlit to give users insights on their documents."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
