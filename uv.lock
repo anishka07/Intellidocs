@@ -740,6 +740,7 @@ dependencies = [
     { name = "chromadb" },
     { name = "google-generativeai" },
     { name = "grpcio" },
+    { name = "kafka-python" },
     { name = "numpy" },
     { name = "pandas" },
     { name = "pymupdf" },
@@ -763,6 +764,7 @@ requires-dist = [
     { name = "chromadb", specifier = "~=0.6.3" },
     { name = "google-generativeai", specifier = ">=0.8.4" },
     { name = "grpcio", specifier = "~=1.66.1" },
+    { name = "kafka-python", specifier = ">=2.1.4" },
     { name = "numpy", specifier = "~=1.26.4" },
     { name = "pandas", specifier = "~=2.2.2" },
     { name = "pymupdf", specifier = ">=1.25.4" },
@@ -825,6 +827,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/10/db/58f950c996c793472e336ff3655b13fbcf1e3b359dcf52dcf3ed3b52c352/jsonschema_specifications-2024.10.1.tar.gz", hash = "sha256:0f38b83639958ce1152d02a7f062902c41c8fd20d558b0c34344292d417ae272", size = 15561 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d1/0f/8910b19ac0670a0f80ce1008e5e751c4a57e14d2c4c13a482aa6079fa9d6/jsonschema_specifications-2024.10.1-py3-none-any.whl", hash = "sha256:a09a0680616357d9a0ecf05c12ad234479f549239d0f5b55f3deea67475da9bf", size = 18459 },
+]
+
+[[package]]
+name = "kafka-python"
+version = "2.1.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2f/20/d0b75cdba5aa06d9423dac34f5215fb66c273d474ddfc9b96bf28251a059/kafka_python-2.1.4.tar.gz", hash = "sha256:7e45be44cc7eb3dcad8b432cc514411454d05971ad26411092577584ee15d67a", size = 306782 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f7/01/e5a16a51093febcee7cd833a6408eb2bcf44f3282cf96a4e731c036454ff/kafka_python-2.1.4-py2.py3-none-any.whl", hash = "sha256:23340cdcd403d4f73564c068fd3b1f4b4be3fc1a89f3ef1a76d46ea889878190", size = 276618 },
 ]
 
 [[package]]
