@@ -127,7 +127,7 @@ class BaseIntelliDocs(ABC):
     def retrieve_top_n(
         self, user_query: str, doc_key: str, top_n: int = 5
     ) -> List[Dict[str, float]]:
-        pass
+        raise NotImplementedError("Not implemented")
 
     def process_documents(self, document_paths: List[str]) -> None:
         self.document_keys = {

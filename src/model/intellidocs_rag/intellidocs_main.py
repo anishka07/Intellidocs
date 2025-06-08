@@ -10,7 +10,6 @@ from src.algorithms.cosine_similarity import cosine_similarity
 from src.model.intellidocs_rag.intellidocs_rag_base import BaseIntelliDocs
 from utils.constants import ConstantSettings, PathSettings
 
-
 class IntellidocsRAG(BaseIntelliDocs):
     def __init__(
         self,
@@ -104,7 +103,6 @@ class IntellidocsRAG(BaseIntelliDocs):
             sentences = [
                 sent.text.strip() for sent in doc.sents if sent.text.strip()
             ]  # Remove empty sentences
-
             chunks = []
             current_chunk = []
             current_length = 0

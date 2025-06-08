@@ -178,3 +178,6 @@ id_chroma_db
 pdfs
 chromadb
 .DS_Store
+src/model/intellidocs_rag_v1
+src/model/intellidocs_rag_v2
+src/model/intellidocs_rag_v3
