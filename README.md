@@ -81,4 +81,8 @@ Query Response (Both Structured and Relevant Chunks):
 2. **Querying**: Select the PDF you want to query using the unique generated PDF key and query the PDF.
 3. **Results**: The system will return the most relevant text chunks extracted from the PDF selected.
 
+## TODOs
 
+1. modify the gRPC code 
+2. Use Enums, Pydantic and make it more dynamic
+3. Web application with FastAPI
