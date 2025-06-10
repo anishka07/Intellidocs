@@ -83,6 +83,7 @@ Query Response (Both Structured and Relevant Chunks):
 
 ## TODOs
 
-1. modify the gRPC code 
-2. Use Enums, Pydantic and make it more dynamic
+1. modify the gRPC code to make it more robust 
+2. Make the code more dynamic
 3. Web application with FastAPI
+4. dockerize the whole thing
