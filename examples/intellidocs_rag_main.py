@@ -1,6 +1,6 @@
 import os
 
-from src.llms.gemini_response import gemini_response
+from src.response.gemini_response import gemini_response
 from src.model.intellidocs_rag.intellidocs_main import IntellidocsRAG
 from utils.constants import PathSettings, ConstantSettings
 
