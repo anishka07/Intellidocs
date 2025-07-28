@@ -181,3 +181,4 @@ chromadb
 src/model/intellidocs_rag_v1
 src/model/intellidocs_rag_v2
 src/model/intellidocs_rag_v3
+intellidocs-client
