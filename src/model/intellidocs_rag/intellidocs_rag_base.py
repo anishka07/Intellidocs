@@ -4,12 +4,32 @@ import pickle
 import uuid
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
+from threading import Lock
 
 import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from tqdm.auto import tqdm
 
+
+class SentenceTransformerSingleton:
+    _instance = None
+    _lock = Lock()
+
+    def __new__(cls, model_name: str):
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = super(SentenceTransformerSingleton, cls).__new__(cls)
+                cls._instance._initialize(model_name)
+        return cls._instance
+    
+    def _intitialize(self, model_name: str):
+        self.model_name = model_name
+        self.model = SentenceTransformer(model_name_or_path=self.model_name)
+        
+    def get_model(self):
+        return self.model
+    
 
 class BaseIntelliDocs(ABC):
     def __init__(
@@ -25,7 +45,7 @@ class BaseIntelliDocs(ABC):
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         )
         self.chunk_size = chunk_size
-        self.embedding_model = SentenceTransformer(embedding_model)
+        self.embedding_model = SentenceTransformerSingleton(embedding_model).get_model()
         self.chroma_client = chromadb.Client(
             Settings(persist_directory=chroma_db_dir, anonymized_telemetry=False)
         )
