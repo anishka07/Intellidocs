@@ -34,7 +34,7 @@ class IntellidocsRAG(BaseIntelliDocs):
         """
         return os.path.splitext(os.path.basename(document_path))[0] + "_key"
 
-    def extract_text(self, document_paths: List[str]) -> Dict[str, Optional[str]]:
+    def extract_text(self, document_path: List[str]) -> Dict[str, Optional[str]]:
         """
         Extract text from PDF documents using PyMuPDF (Fitz).
 
@@ -42,7 +42,7 @@ class IntellidocsRAG(BaseIntelliDocs):
         :return: Dictionary of document keys to extracted text
         """
         extracted_texts = {}
-        for pdf_path in document_paths:
+        for pdf_path in document_path:
             pdf_key = self.document_keys[pdf_path]
             cache_key = f"{pdf_key}_text"
 
@@ -75,7 +75,7 @@ class IntellidocsRAG(BaseIntelliDocs):
 
         return extracted_texts
 
-    def chunk_text(self, extracted_texts: Dict[str, str]) -> Dict[str, List[str]]:
+    def chunk_text(self, extracted_text: Dict[str, str]) -> Dict[str, List[str]]:
         """
         Chunk the extracted text for each PDF using Spacy for sentence segmentation.
 
@@ -84,7 +84,7 @@ class IntellidocsRAG(BaseIntelliDocs):
         """
         chunked_texts = {}
 
-        for pdf_key, extracted_text in extracted_texts.items():
+        for pdf_key, extracted_text in extracted_text.items():
             if extracted_text is None:
                 continue
 
@@ -186,3 +186,4 @@ class IntellidocsRAG(BaseIntelliDocs):
         :param pdf_doc_paths: List of PDF document paths to process
         """
         self.process_documents(pdf_doc_paths)
+

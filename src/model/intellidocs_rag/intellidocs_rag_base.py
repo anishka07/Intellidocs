@@ -1,10 +1,10 @@
+from abc import ABC, abstractmethod
 import logging
 import os
 import pickle
-import uuid
-from abc import ABC, abstractmethod
-from typing import Dict, List, Optional
 from threading import Lock
+from typing import Dict, List, Optional
+import uuid
 
 import chromadb
 from chromadb.config import Settings
@@ -20,7 +20,7 @@ class SentenceTransformerSingleton:
         with cls._lock:
             if cls._instance is None:
                 cls._instance = super(SentenceTransformerSingleton, cls).__new__(cls)
-                cls._instance._initialize(model_name)
+                cls._instance._intitialize(model_name)
         return cls._instance
     
     def _intitialize(self, model_name: str):

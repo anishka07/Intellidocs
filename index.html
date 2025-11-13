@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anishka Mukherjee</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: #0a0a0a;
+    color: #e0e0e0;
+    display: flex;
+    min-height: 100vh;
+}
+a { text-decoration: none; color: inherit; }
+
+.sidebar {
+    width: 220px;
+    border-right: 1px solid #333;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.brand {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: #ccc;
+}
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+.nav a {
+    font-size: 0.95rem;
+    color: #aaa;
+    transition: color 0.3s;
+}
+.nav a:hover { color: #fff; }
+.nav span {
+    color: #666;
+    margin-right: 0.3rem;
+}
+
+.main {
+    flex: 1;
+    padding: 3rem;
+    overflow-y: auto;
+}
+.welcome {
+    margin-bottom: 4rem;
+}
+.welcome h1 {
+    font-size: 1.5rem;
+    color: #ccc;
+    margin-bottom: 0.5rem;
+}
+.welcome p {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+section {
+    margin-bottom: 4rem;
+}
+h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #fff;
+    text-transform: lowercase;
+}
+p {
+    font-size: 0.95rem;
+    color: #ccc;
+    line-height: 1.6;
+    max-width: 700px;
+}
+.projects, .skills, .contact-links {
+    margin-top: 1rem;
+}
+
+.project {
+    margin-bottom: 2rem;
+}
+.project h3 {
+    font-size: 1rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+.project p {
+    color: #999;
+    font-size: 0.9rem;
+}
+.project-links a {
+    margin-right: 1rem;
+    font-size: 0.8rem;
+    color: #777;
+    transition: color 0.3s;
+}
+.project-links a:hover { color: #ccc; }
+
+.skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+}
+.skill {
+    background: #111;
+    border: 1px solid #222;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    color: #ccc;
+}
+
+.contact-links a {
+    margin-right: 1.5rem;
+    font-size: 0.9rem;
+    color: #888;
+    transition: color 0.3s;
+}
+.contact-links a:hover { color: #fff; }
+
+footer {
+    font-size: 0.75rem;
+    color: #555;
+    margin-top: 2rem;
+}
+@media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #333;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .main { padding: 2rem; }
+    .nav { flex-direction: row; gap: 1rem; }
+}
+</style>
+</head>
+<body>
+    <div class="sidebar">
+        <div>
+            <div class="brand">anishka{};</div>
+            <div class="nav">
+                <a href="#about"><span>001 |</span> about</a>
+                <a href="#projects"><span>002 |</span> projects</a>
+                <a href="#skills"><span>003 |</span> skills</a>
+                <a href="#contact"><span>004 |</span> contact</a>
+            </div>
+        </div>
+        <footer>&copy; 2024 Anishka Mukherjee</footer>
+    </div>
+    <div class="main">
+        <div class="welcome">
+            <h1>$echo "Welcome"</h1>
+            <p>this is the personal portfolio website of Anishka Mukherjee</p>
+        </div>
+
+        <section id="about">
+            <h2>about</h2>
+            <p>minimalist developer with a passion for clean code and elegant solutions. i build things that work well and look good. currently focused on web development, machine learning, and everything in between.</p>
+        </section>
+
+        <section id="projects">
+            <h2>projects</h2>
+            <div class="projects">
+                <div class="project">
+                    <h3>project one</h3>
+                    <p>a minimal task management app built with react and node.js. features clean ui and real-time updates.</p>
+                    <div class="project-links">
+                        <a href="#">live demo</a>
+                        <a href="#">source code</a>
+                    </div>
+                </div>
+                <div class="project">
+                    <h3>project two</h3>
+                    <p>machine learning model for sentiment analysis. trained on custom dataset with 95% accuracy.</p>
+                    <div class="project-links">
+                        <a href="#">live demo</a>
+                        <a href="#">source code</a>
+                    </div>
+                </div>
+                <div class="project">
+                    <h3>project three</h3>
+                    <p>dark theme portfolio site. responsive design with smooth animations and clean typography.</p>
+                    <div class="project-links">
+                        <a href="#">live demo</a>
+                        <a href="#">source code</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills">
+            <h2>skills</h2>
+            <div class="skills">
+                <span class="skill">Python</span>
+                <span class="skill">Go</span>
+                <span class="skill">Tensorflow</span>
+                <span class="skill">PyTorch</span>
+                <span class="skill">Microservices</span>
+                <span class="skill">Machine Learning</span>
+                <span class="skill">Deep Learning</span>
+                <span class="skill">Docker</span>
+                <span class="skill">git</span>
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2>contact</h2>
+            <p>let's build something together</p>
+            <div class="contact-links">
+                <a href="mailto:your.email@example.com">email</a>
+                <a href="https://github.com/yourusername" target="_blank">github</a>
+                <a href="https://linkedin.com/in/yourusername" target="_blank">linkedin</a>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
