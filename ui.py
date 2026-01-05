@@ -6,7 +6,7 @@ import tempfile
 import streamlit as st
 
 from src.model.intellidocs_rag.intellidocs_main import IntellidocsRAG
-from src.response.gemini_response import gemini_response
+from src.response.llm_response import llm_response
 from utils.constants import ConstantSettings, PathSettings
 
 logging.basicConfig(level=logging.INFO)
@@ -103,20 +103,18 @@ def main():
             if user_query and selected_pdf_key:
                 try:
                     st.subheader(f"Query Results for {selected_pdf_key}: ")
-                    results = rag.retrieve_top_n(
-                        user_query, selected_pdf_key, top_n=5
-                    )
+                    results = rag.retrieve_top_n(user_query, selected_pdf_key, top_n=5)
                     st.subheader("Response from LLM: ")
                     top_texts = []
                     for item in results:
                         chunk = item["chunk"].strip()
                         score = item["score"]
                         top_texts.append({"text": chunk, "score": score})
-                    llm_response = gemini_response(
-                        user_query=user_query,
+                    response = llm_response(
+                        query=user_query,
                         context=top_texts,
                     )
-                    st.write(llm_response)
+                    st.write(response)
                     if not results:
                         st.write("No results found.")
                     else:

@@ -1,6 +1,7 @@
 import os
 import shutil
-from constants import PathSettings
+
+from utils.constants import PathSettings
 
 
 def clear_directory(directory):

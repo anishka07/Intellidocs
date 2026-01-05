@@ -11,7 +11,7 @@ class PathSettings:
 class ConstantSettings:
     CHUNK_SIZE: int = 400
     EMBEDDING_MODEL_NAME: str = "all-mpnet-base-v2"
-    GEMINI_PROMPT = """ From the given context answer the user query. Give answer in a concise form.
+    LLM_PROMPT = """ From the given context answer the user query. Give answer in a concise form.
     context: {}
     user query: {}
     If the context does not match the query, notify the user with the message.

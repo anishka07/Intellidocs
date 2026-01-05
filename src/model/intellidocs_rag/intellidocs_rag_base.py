@@ -1,10 +1,10 @@
-from abc import ABC, abstractmethod
 import logging
 import os
 import pickle
+import uuid
+from abc import ABC, abstractmethod
 from threading import Lock
 from typing import Dict, List, Optional
-import uuid
 
 import chromadb
 from chromadb.config import Settings
@@ -22,14 +22,14 @@ class SentenceTransformerSingleton:
                 cls._instance = super(SentenceTransformerSingleton, cls).__new__(cls)
                 cls._instance._intitialize(model_name)
         return cls._instance
-    
+
     def _intitialize(self, model_name: str):
         self.model_name = model_name
         self.model = SentenceTransformer(model_name_or_path=self.model_name)
-        
+
     def get_model(self):
         return self.model
-    
+
 
 class BaseIntelliDocs(ABC):
     def __init__(

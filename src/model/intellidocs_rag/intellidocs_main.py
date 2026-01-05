@@ -10,6 +10,7 @@ from src.algorithms.cosine_similarity import cosine_similarity
 from src.model.intellidocs_rag.intellidocs_rag_base import BaseIntelliDocs
 from utils.constants import ConstantSettings, PathSettings
 
+
 class IntellidocsRAG(BaseIntelliDocs):
     def __init__(
         self,
@@ -97,6 +98,7 @@ class IntellidocsRAG(BaseIntelliDocs):
                 continue
 
             self.logger.info(f"Chunking extracted text for {pdf_key}...")
+            print(ConstantSettings.SPACY_LOAD)
             nlp = spacy.load(ConstantSettings.SPACY_LOAD)
             nlp.max_length = max(len(extracted_text), nlp.max_length)
             doc = nlp(extracted_text)
@@ -186,4 +188,3 @@ class IntellidocsRAG(BaseIntelliDocs):
         :param pdf_doc_paths: List of PDF document paths to process
         """
         self.process_documents(pdf_doc_paths)
-

@@ -1,8 +1,8 @@
 import os
 
-from src.response.gemini_response import gemini_response
 from src.model.intellidocs_rag.intellidocs_main import IntellidocsRAG
-from utils.constants import PathSettings, ConstantSettings
+from src.response.llm_response import llm_response
+from utils.constants import ConstantSettings, PathSettings
 
 rag = IntellidocsRAG(
     chunk_size=ConstantSettings.CHUNK_SIZE,
@@ -33,8 +33,8 @@ def query_pdf(document_pdf_key: str, query_from_user: str):
         top_res = rag.retrieve_top_n(
             user_query=query_from_user, doc_key=document_pdf_key, top_n=5
         )
-        llm_res = gemini_response(
-            user_query=query_from_user,
+        llm_res = llm_response(
+            query=query_from_user,
             context=top_res,
         )
         print("IntelliDocs: ", llm_res)
